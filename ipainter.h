@@ -12,7 +12,7 @@ public:
     virtual void draw() = 0;
     virtual void setModel(Model * model);
     virtual Model * getModel();
-    void setIFunctions(IFunctions * iFunctions);
+    virtual void setIFunctions(IFunctions * iFunctions);
 protected:
     IFunctions * m_IFunctions;
     Model * m_model;

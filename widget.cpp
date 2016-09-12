@@ -90,42 +90,31 @@ void Widget::initializeGL()
         itemUS.insert(pointItem);
     }
 
-    for(int i = 0; i < 2; ++i)
+    for(int i = 0; i < 1000; ++i)
     {
         PolygonItem * polygonItem = new PolygonItem();
         PointDV points;
         PointD p;
-        double z = (rand() % 500);
-        p[0] = (rand() % 500);
-        p[1] = (rand() % 500);
-        p[2] = z;
+       // double z = (rand() % 500);
+        p[0] = -500 + (rand() % 500);
+        p[1] = -500 + (rand() % 500);
         points.push_back(p);
         PointD p1;
         p1[0] = p[0];
-        p1[1] = p[1] + 100;
-        p1[2] = z;
+        p1[1] = p[1] + 10;
         points.push_back(p1);
         PointD p2;
-        p2[0] = p[0] + 100;
-        p2[1] = p[1] + 100;
-        p2[2] = z;
+        p2[0] = p[0] + 10;
+        p2[1] = p[1] + 10;
         points.push_back(p2);
         PointD p3;
-        p3[0] = p[0] + 100;
+        p3[0] = p[0] + 10;
         p3[1] = p[1];
-        p3[2] = z;
         points.push_back(p3);
         points.push_back(p);
 
         polygonItem->setPoints(points);
-        float fill[4] = {0.0, 1.0, 0.0, 1.0};
-        if(i % 2 == 0)
-        {
-            fill[0] = 1.0;
-            fill[1] = 0.0;
-            fill[2] = 0.0;
-            fill[3] = 1.0;
-        }
+        float fill[4] = {1.0, 0.0, 0.0, 1.0};
         polygonItem->setFill(&fill[0]);
         itemUS.insert(polygonItem);
     }
@@ -191,14 +180,14 @@ void Widget::initializeGL()
 //    itemUS.insert(item_2);
 
     BoundingBox input(PointD(-1000, -1000, -1000), PointD(1000, 1000, 1000));
-    plydriver driver;
-    PlyModel * plyModel = new PlyModel(input);
-    driver.load(plyModel,
-                QString("%1%2%3")
-                .arg(qApp->applicationDirPath())
-                .arg("/")
-                .arg("dragon.ply").toStdString().c_str());
-    m_render->addModel(plyModel);
+//    plydriver driver;
+//    PlyModel * plyModel = new PlyModel(input);
+//    driver.load(plyModel,
+//                QString("%1%2%3")
+//                .arg(qApp->applicationDirPath())
+//                .arg("/")
+//                .arg("dragon.ply").toStdString().c_str());
+//    m_render->addModel(plyModel);
 //    BoundingBox input;
 //    for(auto & v : itemUS)
 //        BoundingBox::calculate(input, v->getBoundingBox());

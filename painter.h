@@ -27,9 +27,13 @@ public:
     painter();
     ~painter();
     void draw();
+    void setIFunctions(IFunctions * iFunctions);
 private:
+    void init_shaders();
     ImageTextures m_imageTextures;
     CubeTextures m_cubeTextures;
+    unsigned int m_shaderId;
+    unsigned int m_fShaderId;
 };
 
 void drawPoints(const std::vector<PointItem> &pointItemV, IFunctions * iFunctions);
@@ -40,6 +44,8 @@ void drawImages(const std::vector<ImageItem *> &imageItemV,
 void drawCubes(const std::vector<CubeItem *> & cubeItemV,
                IFunctions * iFunctions, CubeTextures & cubeTextures);
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
+                  unsigned int shaderId,
+                  unsigned int fShaderId,
                   IFunctions * iFunctions);
 
 #endif // PAINTER_H

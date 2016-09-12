@@ -1,6 +1,11 @@
 #include "painter.h"
+#include <QDebug>
 
-painter::painter(){}
+void shaderRect(IFunctions * iFunctions, unsigned int &shaderId, unsigned int &fShaderId);
+
+painter::painter()
+{
+}
 
 painter::~painter()
 {
@@ -58,14 +63,25 @@ void painter::draw()
     }
     if(pointItemV.size() > 0)
         drawPoints(pointItemV, m_IFunctions);
-//    if(polygonItemV.size() > 0)
-//        drawPolygons(polygonItemV);
+    if(polygonItemV.size() > 0)
+        drawPolygons(polygonItemV, m_shaderId, m_fShaderId, m_IFunctions);
     if(imageItemV.size() > 0)
         drawImages(imageItemV, m_IFunctions, m_imageTextures);
     if(cubeItemV.size() > 0)
         drawCubes(cubeItemV, m_IFunctions, m_cubeTextures);
 //    if(m_model->getType() == Model::OCTOTREE)
-//        drawOctoModel((OctoModel*)m_model, m_IFunctions);
+    //        drawOctoModel((OctoModel*)m_model, m_IFunctions);
+}
+
+void painter::setIFunctions(IFunctions *iFunctions)
+{
+    ipainter::setIFunctions(iFunctions);
+    init_shaders();
+}
+
+void painter::init_shaders()
+{
+    shaderRect(m_IFunctions, m_shaderId, m_fShaderId);
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV,
@@ -295,36 +311,46 @@ void drawCubes(const std::vector<CubeItem *> & cubeItemV,
     }
 }
 
+//unsigned int vShader = 0;
+//unsigned int fShader = 0;
 
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
+                  unsigned int shaderId,
+                  unsigned int fShaderId,
                   IFunctions * iFunctions)
 {
-//    iFunctions->glUseProgram(m_programRect);
-//    for(PolygonItem * item : polygonItemV)
-//    {
-//        iFunctions->glUniform4fv(attrib_fragment, 1, item->getFill());
-
-//        float v1[] = {0.95, 0.95};
-//        iFunctions->glUniform2fv(attrib_border, 1, &v1[0]);
-//        iFunctions->glBegin(GL_POLYGON);
-//        int i = 0;
-//        float x[] = {-1, -1, 1,  1};
-//        float y[] = {-1,  1, 1, -1};
-//        for(const PointD & p : item->getPoints())
-//        {
-//            iFunctions->glTexCoord2f(x[i], y[i]);
-//            ++i;
-
-//            iFunctions->glVertex3d(p.x(), p.y(), p.z());
-//        }
-//        iFunctions->glEnd();
-//    }
-//    iFunctions->glUseProgram(0);
+    iFunctions->glUseProgram(shaderId);
+    for(PolygonItem * item : polygonItemV)
+    {
+        //const char * attrib_fragment = "color";
+        float color[4] = {0.0, 1.0, 0.0, 1.0};
+        iFunctions->glUniform4fv(fShaderId, 1, &color[0]);
+        float v1[] = {0.95, 0.95};
+        //const char * attrib_border = "border";
+        iFunctions->glUniform2fv(fShaderId, 1, &v1[0]);
+/*
+        const float * f = item->getFill();
+        iFunctions->glColor3f(f[0], f[1], f[2])*/;
+        iFunctions->glBegin(GL_POLYGON);
+//        for(auto & v: item->getPoints())
+//            iFunctions->glVertex3d(v.x(), v.y(), v.z());
+        int i = 0;
+        float x[] = {-1, -1, 1,  1};
+        float y[] = {-1,  1, 1, -1};
+        for(const PointD & p : item->getPoints())
+        {
+            iFunctions->glTexCoord2f(x[i], y[i]);
+            ++i;
+            iFunctions->glVertex3d(p.x(), p.y(), p.z());
+        }
+        iFunctions->glEnd();
+    }
+    iFunctions->glUseProgram(0);
 }
 
 
 
-void shaderRect(IFunctions * iFunctions)
+void shaderRect(IFunctions * iFunctions, unsigned int &shaderId, unsigned int &fShaderId)
 {
     const char * valueV = "void main() {\n"
                           "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
@@ -332,47 +358,45 @@ void shaderRect(IFunctions * iFunctions)
                          "}\n";
 
     const char * valueF = "uniform vec4 color;\n"
-                          "uniform vec2 border;"
+                          "uniform vec2 border;\n"
                           "void main() {\n"
-                          "if(step(abs(gl_TexCoord[0].x), border.x) \n"
-                          " && step(abs(gl_TexCoord[0].y), border.y)) \n"
-                          " //if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
+                          " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
                           " gl_FragColor = color;\n"
                           " else\n"
-                          " gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); \n"
+                          " gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n"
                           "}\n";
 
 
-    unsigned int vShader = iFunctions->glCreateShader(GL_VERTEX_SHADER);
-    iFunctions->glShaderSource(vShader, 1, &valueV, NULL); // передать текст шейдера
-    iFunctions->glCompileShader(vShader); // скомпилировать шейдер
+//    unsigned int vShader = iFunctions->glCreateShader(GL_VERTEX_SHADER);
+//    iFunctions->glShaderSource(vShader, 1, &valueV, NULL); // передать текст шейдера
+//    iFunctions->glCompileShader(vShader); // скомпилировать шейдер
 
-//    unsigned int fShader = iFunctions->glCreateShader(GL_FRAGMENT_SHADER);
-//    iFunctions->glShaderSource(fShader, 1, &valueF, NULL); // передать текст шейдера
-//    iFunctions->glCompileShader(fShader); // скомпилировать шейдер
+    fShaderId = iFunctions->glCreateShader(GL_FRAGMENT_SHADER);
+    iFunctions->glShaderSource(fShaderId, 1, &valueF, NULL); // передать текст шейдера
+    iFunctions->glCompileShader(fShaderId); // скомпилировать шейдер
 
-//    m_programRect = iFunctions->glCreateProgram();
-//    iFunctions->glAttachShader(m_programRect, vShader); // подключить шейдер к проге
-//    iFunctions->glAttachShader(m_programRect, fShader);
-//    iFunctions->glLinkProgram(m_programRect); // слинковать прогу
+    shaderId = iFunctions->glCreateProgram();
+  //  iFunctions->glAttachShader(shaderId, vShader); // подключить шейдер к проге
+    iFunctions->glAttachShader(shaderId, fShaderId);
+    iFunctions->glLinkProgram(shaderId); // слинковать прогу
 
-//    int ok;
-//    iFunctions->glGetProgramiv(m_programRect, GL_LINK_STATUS, &ok); // проверить сборку
-//    if(!ok)
-//    {
-//        qDebug() << "error attach shaders";
-//        return;
-//    }
+    int ok;
+    iFunctions->glGetProgramiv(shaderId, GL_LINK_STATUS, &ok); // проверить сборку
+    if(!ok)
+    {
+        qDebug() << "error attach shaders";
+        return;
+    }
 
 //    const char * attr_name_color = "color";
-//    attrib_fragment = iFunctions->glGetUniformLocation(m_programRect, attr_name_color); // проверить сущ. аттрибута
+//    attrib_fragment = iFunctions->glGetUniformLocation(vShader, attr_name_color); // проверить сущ. аттрибута
 //    if(attrib_fragment == -1)
 //    {
 //        qDebug() << "could not bind attribute coord" << attr_name_color;
 //        return;
 //    }
 //    const char * attrib_border_name = "border";
-//    attrib_border = iFunctions->glGetUniformLocation(m_programRect, attrib_border_name); // проверить сущ. аттрибута
+//    attrib_border = iFunctions->glGetUniformLocation(fShader, attrib_border_name); // проверить сущ. аттрибута
 //    if(attrib_border == -1)
 //    {
 //        qDebug() << "could not bind attribute border" << attrib_border;
@@ -403,7 +427,7 @@ void shaderCube()
 //                         " gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
 //                         "}\n";
 
-//    const char * valueF = "uniform vec4 color;\n"
+//    const char * valueF = "uniform vec4 color = vec4(1.0, 0.0, 0.0, 0.0);\n"
 //                          "uniform vec2 border;"
 //                          "void main() {\n"
 //                          " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
