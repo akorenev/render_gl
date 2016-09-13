@@ -1,5 +1,5 @@
-#ifndef BUMBLE_SORT_H
-#define BUMBLE_SORT_H
+#ifndef _BUMBLE_SORT_H_
+#define _BUMBLE_SORT_H_
 
 #include "swap.h"
 
@@ -12,4 +12,4 @@ void bumble_sort(T * m, Type size)
                 swap_el<T>(&m[j], &m[j + 1]);
 }
 
-#endif // BUMBLE_SORT_H
+#endif // _BUMBLE_SORT_H_

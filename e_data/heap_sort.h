@@ -1,5 +1,5 @@
-#ifndef SORT_HEAP_H
-#define SORT_HEAP_H
+#ifndef _HEAP_SORT_H_
+#define _HEAP_SORT_H_
 
 #include "swap.h"
 
@@ -101,4 +101,4 @@ void sort_heap(T * m, Type size)
         max_heapify(m, 0 , i);
     }
 }
-#endif // SORT_HEAP_H
+#endif // _HEAP_SORT_H_

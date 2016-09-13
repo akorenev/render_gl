@@ -45,9 +45,9 @@ HEADERS  += widget.h \
     octotree.h \
     color.h \
     point.h \
-    sort_heap.h \
-    swap.h \
-    bumble_sort.h \
+    e_data/swap.h \
+    e_data/bumble_sort.h \
+    e_data/heap_sort.h \
     ray.h \
     boundingbox.h \
     item_t.h \
