@@ -1,17 +1,10 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include "ifunctions.h"
-#include "model.h"
-#include "pointitem.h"
-#include "polygonitem.h"
-#include "imageitem.h"
-#include "cubeitem.h"
 #include <QMatrix4x4>
 #include <QColor>
-#include "octotree.h"
-#include "plymodel.h"
 #include "ipainter.h"
+#include "ifunctions.h"
 
 
 namespace draw
@@ -40,7 +33,6 @@ public:
     const double & getRotateZ();
     void releaseMouse();
 private:
-    void drawPolygons(const std::vector<PolygonItem*> & polygonItemV);
     void calculateBoundingBox();
 signals:
     void update();
@@ -57,12 +49,6 @@ private:
     double m_rotate_y;
     double m_rotate_x;
     double m_rotate_z;
-    unsigned int m_programRect;
-    unsigned int m_programCube;
-
-    int attrib_vertex;
-    int attrib_fragment;
-    int attrib_border;
     Item_t::Ptr m_item_t;
     IPainterL m_painterL;
 };
