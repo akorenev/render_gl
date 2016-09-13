@@ -1,15 +1,19 @@
 #include "model.h"
 #include "ray.h"
 
-Model::Model(){}
+Model::Model(bool needRemoved)
+    : m_needRemoved(needRemoved){}
 
 Model::~Model()
 {
-    ItemUS::iterator it = m_itemUS.begin();
-    while(it != m_itemUS.end())
+    if(m_needRemoved)
     {
-        delete *it;
-        it = m_itemUS.erase(it);
+        ItemUS::iterator it = m_itemUS.begin();
+        while(it != m_itemUS.end())
+        {
+            delete *it;
+            it = m_itemUS.erase(it);
+        }
     }
 }
 

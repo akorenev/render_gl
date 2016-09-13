@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "pointitem.h"
 #include <QDebug>
+#include "plymodel.h"
 
 using namespace std;
 
@@ -21,8 +22,10 @@ struct Header
     unsigned int countFace;
 };
 
-bool plydriver::load(PlyModel * model, const char * filepath)
+bool plydriver::load(Model * model, const char * filepath)
 {
+    PlyModel * plyModel = dynamic_cast<PlyModel*>(model);
+    Q_ASSERT(plyModel);
     string line;
     ifstream file(filepath);
     if(file.is_open())
@@ -218,15 +221,14 @@ bool plydriver::load(PlyModel * model, const char * filepath)
             }
 
         }
-        model->setVertexes(vertexes, vertexSize);
-        model->setFaceVertexes(faceVertex, faceVertexSize);
+        plyModel->setVertexes(vertexes, vertexSize);
+        plyModel->setFaceVertexes(faceVertex, faceVertexSize);
     }
     file.close();
     return true;
 }
 
-bool plydriver::save(PlyModel * model,
-                     const char * filepath)
+bool plydriver::save(Model * model, const char * filepath)
 {
-
+    return false;
 }

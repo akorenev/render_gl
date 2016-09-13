@@ -70,7 +70,7 @@ void painter::draw()
     if(cubeItemV.size() > 0)
         drawCubes(cubeItemV, m_IFunctions, m_cubeTextures);
 //    if(m_model->getType() == Model::OCTOTREE)
-    //        drawOctoModel((OctoModel*)m_model, m_IFunctions);
+//            drawOctoModel((OctoModel*)m_model, m_IFunctions);
 }
 
 void painter::setIFunctions(IFunctions *iFunctions)

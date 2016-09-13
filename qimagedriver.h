@@ -1,13 +1,14 @@
-#ifndef PLYDRIVER_H
-#define PLYDRIVER_H
+#ifndef QIMAGEDRIVER_H
+#define QIMAGEDRIVER_H
 
 #include "basedriver.h"
 
-class plydriver : public basedriver
+class qimagedriver : public basedriver
 {
 public:
+    qimagedriver();
     bool load(Model * model, const char * filepath);
     bool save(Model * model, const char * filepath);
 };
 
-#endif // PLYDRIVER_H
+#endif // QIMAGEDRIVER_H

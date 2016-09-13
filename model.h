@@ -13,7 +13,7 @@ public:
         PLY_MODEL
     };
 public:
-    Model();
+    Model(bool needRemoved = true);
     virtual ~Model();
     virtual const ItemUS& getItemL();
     virtual void setItemL(const ItemUS & itemUS);
@@ -24,6 +24,7 @@ public:
 protected:
     ItemUS m_itemUS;
     BoundingBox m_boundingBox;
+    bool m_needRemoved;
 };
 
 typedef std::list<Model *> ModelL;

@@ -7,7 +7,10 @@ ImageItem::ImageItem(unsigned char * bits,
     : m_bits(bits)
     , m_depth(depth)
     , m_w(w)
-    , m_h(h){}
+    , m_h(h)
+{
+    setPos(m_point);
+}
 
 ImageItem::~ImageItem(){}
 

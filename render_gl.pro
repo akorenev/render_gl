@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     plymodel.cpp \
     ipainter.cpp \
     plypainter.cpp \
-    painter.cpp
+    painter.cpp \
+    qimagedriver.cpp \
+    basedriver.cpp
 HEADERS  += widget.h \
     render.h \
     model.h \
@@ -56,7 +58,9 @@ HEADERS  += widget.h \
     ipainter.h \
     plypainter.h \
     painter.h \
-    e_data/insertion_sort.h
+    e_data/insertion_sort.h \
+    qimagedriver.h \
+    basedriver.h
 
 RESOURCES += \
     res.qrc

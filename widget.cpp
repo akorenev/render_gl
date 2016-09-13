@@ -9,6 +9,7 @@
 #include "octotree.h"
 #include "plydriver.h"
 #include "plymodel.h"
+#include "qimagedriver.h"
 #include <QApplication>
 
 Widget::Widget(QWidget *parent)
@@ -20,52 +21,6 @@ Widget::~Widget()
     delete m_render;
 }
 
-ImageItem * loadImageItem(const QString & path)
-{
-    QImage i(path);
-    unsigned char * bits = 0;
-    unsigned int w = 0;
-    unsigned int h = 0;
-    unsigned int d = 0;
-    if(!i.isNull())
-    {
-        w = i.width();
-        h = i.height();
-        d = (i.depth() / 8);
-        unsigned char * b = i.bits();
-        int size = w * h * d;
-        bits = new unsigned char[size];
-        memset(bits,  0, size);
-        for(unsigned int i = 0;  i < w; i++)
-        {
-            for(unsigned int j = 0; j < h; j++)
-            {
-                int index = (j * w + i) * d;
-                switch (d)
-                {
-                case 1:
-                    bits[index] = b[index];
-                    break;
-                case 4:
-                {
-                    bits[index + 0] = b[index + 2];
-                    bits[index + 1] = b[index + 1];
-                    bits[index + 2] = b[index + 0];
-                    bits[index + 3] = b[index + 3];
-                } break;
-                default:
-                    break;
-                }
-            }
-        }
-    }
-    if(!bits)
-        return 0;
-    ImageItem * item = new ImageItem(bits, d, w, h);
-    return item;
-}
-
-
 void Widget::initializeGL()
 {
     if(m_render)
@@ -76,7 +31,7 @@ void Widget::initializeGL()
 
     ItemUS itemUS;
 
-    for(int i = 0; i < 2000; ++i)
+    for(int i = 0; i < 100; ++i)
     {
         PointItem * pointItem = new PointItem();
         PointD p;
@@ -90,14 +45,14 @@ void Widget::initializeGL()
         itemUS.insert(pointItem);
     }
 
-    for(int i = 0; i < 1000; ++i)
+    for(int i = 0; i < 100; ++i)
     {
         PolygonItem * polygonItem = new PolygonItem();
         PointDV points;
         PointD p;
        // double z = (rand() % 500);
-        p[0] = -500 + (rand() % 500);
-        p[1] = -500 + (rand() % 500);
+        p[0] = -500 + (rand() % 1000);
+        p[1] = -500 + (rand() % 1000);
         points.push_back(p);
         PointD p1;
         p1[0] = p[0];
@@ -119,17 +74,13 @@ void Widget::initializeGL()
         itemUS.insert(polygonItem);
     }
 
+    Model modelImage(0);
+    qimagedriver imagedriver;
+    if(imagedriver.load(&modelImage, ":/test1"))
+       itemUS = cmerge(itemUS, modelImage.getItemL());
 
-//    ImageItem * item1 = loadImageItem(":/test1");
-//    if(item1)
-//    {
-//        item1->setPos(PointD(0, 0));
-//        itemUS.insert(item1);
 
-//        ImageItem * v = new ImageItem(*item1);
-//        v->setPos(PointD(v->w() + 50, 0));
-//        itemUS.insert(v);
-//    }
+    ImageItem * imageItem = (ImageItem*)*modelImage.getItemL().begin();
 
     double k = 50;
     CubeItem * item = new CubeItem();
@@ -138,42 +89,42 @@ void Widget::initializeGL()
                                                  PointD(k, -k, -k),
                                                  PointD(-k, -k, -k),
                                                  ColorD(1.0, 0, 0)));
-    item->getSide(CubeItem::BACK).setTexture(loadImageItem(":/test1"));
+    item->getSide(CubeItem::BACK).setTexture(new ImageItem(*imageItem));
 
     item->setSide(CubeItem::RIGHT, CubeItem::SIDE(PointD(k, -k, -k),
                                                   PointD(k, k, -k),
                                                   PointD(k, k, k),
                                                   PointD(k, -k, k),
                                                   ColorD(0, 1.0, 0)));
-    item->getSide(CubeItem::RIGHT).setTexture(loadImageItem(":/test1"));
+    item->getSide(CubeItem::RIGHT).setTexture(new ImageItem(*imageItem));
     item->setSide(CubeItem::LEFT, CubeItem::SIDE(PointD(-k, -k, k),
                                                  PointD(-k, k, k),
                                                  PointD(-k, k, -k),
                                                  PointD(-k, -k, -k),
                                                  ColorD(0, 0, 1.0)));
-    item->getSide(CubeItem::LEFT).setTexture(loadImageItem(":/test1"));
+    item->getSide(CubeItem::LEFT).setTexture(new ImageItem(*imageItem));
 
     item->setSide(CubeItem::FRONT, CubeItem::SIDE(PointD(k, -k, k),
                                                   PointD(k, k, k),
                                                   PointD(-k, k, k),
                                                   PointD(-k, -k, k),
                                                   ColorD(1.0, 1.0, 1.0)));
-    item->getSide(CubeItem::FRONT).setTexture(loadImageItem(":/test1"));
+    item->getSide(CubeItem::FRONT).setTexture(new ImageItem(*imageItem));
 
     item->setSide(CubeItem::BOTTOM, CubeItem::SIDE(PointD(k, -k, -k),
                                                    PointD(k, -k, k),
                                                    PointD(-k, -k, k),
                                                    PointD(-k, -k, -k),
                                                    ColorD(1.0, 1.0, 0)));
-    item->getSide(CubeItem::BOTTOM).setTexture(loadImageItem(":/test1"));
+    item->getSide(CubeItem::BOTTOM).setTexture(new ImageItem(*imageItem));
 
     item->setSide(CubeItem::TOP, CubeItem::SIDE(PointD(k, k, k),
                                                 PointD(k, k, -k),
                                                 PointD(-k, k, -k),
                                                 PointD(-k, k, k),
                                                 ColorD(1.0, 0, 1.0)));
-    item->getSide(CubeItem::TOP).setTexture(loadImageItem(":/test1"));
-//    itemUS.insert(item);
+    item->getSide(CubeItem::TOP).setTexture(new ImageItem(*imageItem));
+    itemUS.insert(item);
 
 //    CubeItem * item_2 = new CubeItem(*item);
 //    item_2->setPos(PointD(500, 0));
@@ -188,9 +139,8 @@ void Widget::initializeGL()
 //                .arg("/")
 //                .arg("dragon.ply").toStdString().c_str());
 //    m_render->addModel(plyModel);
-//    BoundingBox input;
-//    for(auto & v : itemUS)
-//        BoundingBox::calculate(input, v->getBoundingBox());
+    for(auto & v : itemUS)
+        BoundingBox::calculate(input, v->getBoundingBox());
 //    qDebug() << input.min.x() << input.min.y() << input.min.z()
 //             << input.max.x() << input.max.y() << input.max.z();
     OctoModel * model = new OctoModel(4096, input);
