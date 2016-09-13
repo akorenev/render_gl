@@ -55,7 +55,8 @@ HEADERS  += widget.h \
     plymodel.h \
     ipainter.h \
     plypainter.h \
-    painter.h
+    painter.h \
+    e_data/insertion_sort.h
 
 RESOURCES += \
     res.qrc

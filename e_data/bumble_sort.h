@@ -2,7 +2,7 @@
 #define _BUMBLE_SORT_H_
 
 #include "swap.h"
-
+// O(n ^ 2)
 template<typename T, typename Type>
 void bumble_sort(T * m, Type size)
 {

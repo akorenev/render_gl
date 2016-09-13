@@ -91,6 +91,7 @@ void make_heap(T * m, Type size)
         max_heapify<T, Type>(m, i, size);
 }
 
+// O(n log n)
 template<typename T, typename Type>
 void sort_heap(T * m, Type size)
 {
