@@ -7,6 +7,7 @@
 #include "cubeitem.h"
 #include "polygonitem.h"
 #include "octotree.h"
+#include "shader.h"
 
 typedef std::map<ImageItem *, unsigned int> ImageTextures;
 struct CubeTexture
@@ -34,6 +35,8 @@ private:
     CubeTextures m_cubeTextures;
     unsigned int m_shaderId;
     unsigned int m_fShaderId;
+    Shader::Ptr m_shaderVertexPolygon;
+    Shader::Ptr m_shaderFragmentPolygon;
 };
 
 void drawPoints(const std::vector<PointItem> &pointItemV, IFunctions * iFunctions);
@@ -44,8 +47,7 @@ void drawImages(const std::vector<ImageItem *> &imageItemV,
 void drawCubes(const std::vector<CubeItem *> & cubeItemV,
                IFunctions * iFunctions, CubeTextures & cubeTextures);
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
-                  unsigned int shaderId,
-                  unsigned int fShaderId,
+                  Shader::Ptr shaderFragmentPolygon,
                   IFunctions * iFunctions);
 
 #endif // PAINTER_H

@@ -1,7 +1,9 @@
 #include "painter.h"
 #include <QDebug>
 
-void shaderRect(IFunctions * iFunctions, unsigned int &shaderId, unsigned int &fShaderId);
+void shaderRect(IFunctions * iFunctions,
+                Shader::Ptr & shaderVertexPolygon,
+                Shader::Ptr & shaderFragmentPolygon);
 
 painter::painter()
 {
@@ -64,7 +66,7 @@ void painter::draw()
     if(pointItemV.size() > 0)
         drawPoints(pointItemV, m_IFunctions);
     if(polygonItemV.size() > 0)
-        drawPolygons(polygonItemV, m_shaderId, m_fShaderId, m_IFunctions);
+        drawPolygons(polygonItemV, m_shaderFragmentPolygon, m_IFunctions);
     if(imageItemV.size() > 0)
         drawImages(imageItemV, m_IFunctions, m_imageTextures);
     if(cubeItemV.size() > 0)
@@ -81,7 +83,7 @@ void painter::setIFunctions(IFunctions *iFunctions)
 
 void painter::init_shaders()
 {
-    shaderRect(m_IFunctions, m_shaderId, m_fShaderId);
+    shaderRect(m_IFunctions, m_shaderVertexPolygon, m_shaderFragmentPolygon);
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV,
@@ -311,53 +313,66 @@ void drawCubes(const std::vector<CubeItem *> & cubeItemV,
     }
 }
 
-//unsigned int vShader = 0;
-//unsigned int fShader = 0;
-static int attrib_fragment = 0;
-static int attrib_border = 0;
 
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
-                  unsigned int shaderId,
-                  unsigned int fShaderId,
+                  Shader::Ptr shaderFragmentPolygon,
                   IFunctions * iFunctions)
 {
-    iFunctions->glUseProgram(shaderId);
-    for(PolygonItem * item : polygonItemV)
+    if(shaderFragmentPolygon)
     {
-        //const char * attrib_fragment = "color";
-        float color[4] = {0.0, 1.0, 0.0, 1.0};
-        iFunctions->glUniform4fv(attrib_fragment, 1, &color[0]);
-        float v1[] = {0.95, 0.95};
-        //const char * attrib_border = "border";
-        iFunctions->glUniform2fv(attrib_border, 1, &v1[0]);
-/*
-        const float * f = item->getFill();
-        iFunctions->glColor3f(f[0], f[1], f[2])*/;
-        iFunctions->glBegin(GL_POLYGON);
-//        for(auto & v: item->getPoints())
-//            iFunctions->glVertex3d(v.x(), v.y(), v.z());
-        int i = 0;
-        float x[] = {-1, -1, 1,  1};
-        float y[] = {-1,  1, 1, -1};
-        for(const PointD & p : item->getPoints())
+        iFunctions->glUseProgram(shaderFragmentPolygon->getProgramId());
+        for(PolygonItem * item : polygonItemV)
         {
-            iFunctions->glTexCoord2f(x[i], y[i]);
-            ++i;
-            iFunctions->glVertex3d(p.x(), p.y(), p.z());
+            const Shader::Attributes & attributes = shaderFragmentPolygon->getAttributes();
+            Shader::Attributes::const_iterator it = attributes.find("color");
+            if(it != attributes.cend())
+                iFunctions->glUniform4fv(it->second, 1, &item->getFill()[0]);
+            float v[] = {0.95, 0.95};
+            it = attributes.find("border");
+            if(it != attributes.cend())
+                iFunctions->glUniform2fv(it->second, 1, &v[0]);
+            iFunctions->glBegin(GL_POLYGON);
+            int i = 0;
+            float x[] = {-1, -1, 1,  1};
+            float y[] = {-1,  1, 1, -1};
+            for(const PointD & p : item->getPoints())
+            {
+                iFunctions->glTexCoord2f(x[i], y[i]);
+                ++i;
+                iFunctions->glVertex3d(p.x(), p.y(), p.z());
+            }
+            iFunctions->glEnd();
         }
-        iFunctions->glEnd();
+        iFunctions->glUseProgram(0);
     }
-    iFunctions->glUseProgram(0);
+    else
+    {
+        for(PolygonItem * item : polygonItemV)
+        {
+            iFunctions->glBegin(GL_POLYGON);
+            const float * color = item->getFill();
+            iFunctions->glColor3f(color[0], color[1], color[2]);
+            for(auto & v: item->getPoints())
+                iFunctions->glVertex3d(v.x(), v.y(), v.z());
+            iFunctions->glEnd();
+        }
+
+    }
 }
 
 
 
-void shaderRect(IFunctions * iFunctions, unsigned int &shaderId, unsigned int &fShaderId)
+void shaderRect(IFunctions * iFunctions,
+                Shader::Ptr & shaderVertexPolygon,
+                Shader::Ptr & shaderFragmentPolygon)
 {
     const char * valueV = "void main() {\n"
                           "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
                          " gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
                          "}\n";
+
+    shaderVertexPolygon = Shader::Ptr(new Shader(iFunctions,
+                                                   valueV, Shader::VERTEX));
 
     const char * valueF = "uniform vec4 color;\n"
                           "uniform vec2 border;\n"
@@ -367,114 +382,9 @@ void shaderRect(IFunctions * iFunctions, unsigned int &shaderId, unsigned int &f
                           " else\n"
                           " gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n"
                           "}\n";
-
-
-   unsigned int vShader = iFunctions->glCreateShader(GL_VERTEX_SHADER);
-   iFunctions->glShaderSource(vShader, 1, &valueV, NULL); // передать текст шейдера
-   iFunctions->glCompileShader(vShader); // скомпилировать шейдер
-
-    fShaderId = iFunctions->glCreateShader(GL_FRAGMENT_SHADER);
-    iFunctions->glShaderSource(fShaderId, 1, &valueF, NULL); // передать текст шейдера
-    iFunctions->glCompileShader(fShaderId); // скомпилировать шейдер
-
-    shaderId = iFunctions->glCreateProgram();
-    iFunctions->glAttachShader(shaderId, vShader); // подключить шейдер к проге
-    iFunctions->glAttachShader(shaderId, fShaderId);
-    iFunctions->glLinkProgram(shaderId); // слинковать прогу
-
-    int ok;
-    iFunctions->glGetProgramiv(shaderId, GL_LINK_STATUS, &ok); // проверить сборку
-    if(!ok)
-    {
-        qDebug() << "error attach shaders";
-        return;
-    }
-
-    const char * attr_name_color = "color";
-    attrib_fragment = iFunctions->glGetUniformLocation(shaderId, attr_name_color); // проверить сущ. аттрибута
-    if(attrib_fragment == -1)
-    {
-        qDebug() << "could not bind attribute coord" << attr_name_color;
-    }
-    const char * attrib_border_name = "border";
-    attrib_border = iFunctions->glGetUniformLocation(shaderId, attrib_border_name); // проверить сущ. аттрибута
-    if(attrib_border == -1)
-    {
-        qDebug() << "could not bind attribute border" << attrib_border;
-        return;
-    }
-}
-
-void shaderCube()
-{
-    const char * valueV = "attribute highp vec4 vertex;\n"
-                          "attribute mediump vec4 texCoord;\n"
-                          "varying mediump vec4 texc;\n"
-                          "void main(void)\n"
-                          "{\n"
-                          "glPosition = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-                          "texc = texCoord;\n"
-                          "}\n";
-
-    const char * valueF = "uniform sampler2D texture;\n"
-                          "varying mediump vec4 texc;\n"
-                          "void main(void)\n"
-                          "{\n"
-                          "gl_FragColor = texture2D(texture, texc.st);\n"
-                          "}\n";
-
-//    const char * valueV = "void main() {\n"
-//                          "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-//                         " gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
-//                         "}\n";
-
-//    const char * valueF = "uniform vec4 color = vec4(1.0, 0.0, 0.0, 0.0);\n"
-//                          "uniform vec2 border;"
-//                          "void main() {\n"
-//                          " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
-//                          " gl_FragColor = color;\n"
-//                          " else\n"
-//                          " gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n"
-//                          "}\n";
-
-
-//    unsigned int vShader = iFunctions->glCreateShader(GL_VERTEX_SHADER);
-//    iFunctions->glShaderSource(vShader, 1, &valueV, NULL); // передать текст шейдера
-//    iFunctions->glCompileShader(vShader); // скомпилировать шейдер
-
-//    unsigned int fShader = iFunctions->glCreateShader(GL_FRAGMENT_SHADER);
-//    iFunctions->glShaderSource(fShader, 1, &valueF, NULL); // передать текст шейдера
-//    iFunctions->glCompileShader(fShader); // скомпилировать шейдер
-
-//    m_programCube = iFunctions->glCreateProgram();
-//    iFunctions->glAttachShader(m_programCube, vShader); // подключить шейдер к проге
-////    iFunctions->glAttachShader(m_programCube, fShader);
-//    iFunctions->glBindAttribLocation(m_programCube, vShader, "vertex");
-//    iFunctions->glBindAttribLocation(m_programCube, vShader, "texCoord");
-//    iFunctions->glLinkProgram(m_programCube); // слинковать прогу
-
-//    int ok;
-//    iFunctions->glGetProgramiv(m_programCube, GL_LINK_STATUS, &ok); // проверить сборку
-//    qDebug() << iFunctions->glGetError();
-//    if(!ok)
-//    {
-//        qDebug() << "error attach shaders";
-//        return;
-//    }
-
-
-//    const char * attr_name_color = "color";
-//    attrib_fragment = iFunctions->glGetUniformLocation(m_programCube, attr_name_color); // проверить сущ. аттрибута
-//    if(attrib_fragment == -1)
-//    {
-//        qDebug() << "could not bind attribute coord" << attr_name_color;
-//        return;
-//    }
-//    const char * attrib_border_name = "border";
-//    attrib_border = iFunctions->glGetUniformLocation(m_programCube, attrib_border_name); // проверить сущ. аттрибута
-//    if(attrib_border == -1)
-//    {
-//        qDebug() << "could not bind attribute border" << attrib_border;
-//        return;
-    //    }
+    Shader::Attributes attributes;
+    attributes["color"] = 0;
+    attributes["border"] = 0;
+    shaderFragmentPolygon = Shader::Ptr(new Shader(iFunctions, valueF,
+                                                   Shader::FRAGMENT, attributes));
 }

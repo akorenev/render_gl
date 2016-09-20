@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     plypainter.cpp \
     painter.cpp \
     qimagedriver.cpp \
-    basedriver.cpp
+    basedriver.cpp \
+    shader.cpp
 HEADERS  += widget.h \
     render.h \
     model.h \
@@ -60,7 +61,8 @@ HEADERS  += widget.h \
     painter.h \
     e_data/insertion_sort.h \
     qimagedriver.h \
-    basedriver.h
+    basedriver.h \
+    shader.h
 
 RESOURCES += \
     res.qrc
