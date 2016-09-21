@@ -12,4 +12,4 @@ void bubble_sort(T * m, Type size)
                 swap_el<T>(&m[j], &m[j + 1]);
 }
 
-#endif // _BUMBLE_SORT_H_
+#endif // _BUBBLE_SORT_H_
