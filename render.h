@@ -5,7 +5,7 @@
 #include <QColor>
 #include "ipainter.h"
 #include "ifunctions.h"
-
+#include "shader.h"
 
 namespace draw
 {
@@ -51,6 +51,7 @@ private:
     double m_rotate_z;
     Item_t::Ptr m_item_t;
     IPainterL m_painterL;
+    Shader::Ptr m_shader;
 };
 
 }

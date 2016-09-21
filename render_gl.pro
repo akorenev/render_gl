@@ -62,7 +62,8 @@ HEADERS  += widget.h \
     e_data/insertion_sort.h \
     qimagedriver.h \
     basedriver.h \
-    shader.h
+    shader.h \
+    shaderinfo.h
 
 RESOURCES += \
     res.qrc

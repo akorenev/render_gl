@@ -2,8 +2,7 @@
 #include <QDebug>
 
 void shaderRect(IFunctions * iFunctions,
-                Shader::Ptr & shaderVertexPolygon,
-                Shader::Ptr & shaderFragmentPolygon);
+                Shader::Ptr & shaderPolygon);
 
 painter::painter()
 {
@@ -66,7 +65,7 @@ void painter::draw()
     if(pointItemV.size() > 0)
         drawPoints(pointItemV, m_IFunctions);
     if(polygonItemV.size() > 0)
-        drawPolygons(polygonItemV, m_shaderFragmentPolygon, m_IFunctions);
+        drawPolygons(polygonItemV, m_shaderPolygon, m_IFunctions);
     if(imageItemV.size() > 0)
         drawImages(imageItemV, m_IFunctions, m_imageTextures);
     if(cubeItemV.size() > 0)
@@ -83,7 +82,7 @@ void painter::setIFunctions(IFunctions *iFunctions)
 
 void painter::init_shaders()
 {
-    shaderRect(m_IFunctions, m_shaderVertexPolygon, m_shaderFragmentPolygon);
+    shaderRect(m_IFunctions, m_shaderPolygon);
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV,
@@ -315,16 +314,17 @@ void drawCubes(const std::vector<CubeItem *> & cubeItemV,
 
 
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
-                  Shader::Ptr shaderFragmentPolygon,
+                  Shader::Ptr shaderPolygon,
                   IFunctions * iFunctions)
 {
-    if(shaderFragmentPolygon)
+    if(shaderPolygon)
     {
-        iFunctions->glUseProgram(shaderFragmentPolygon->getProgramId());
+        iFunctions->glUseProgram(shaderPolygon->getProgramId());
         for(PolygonItem * item : polygonItemV)
         {
-            const Shader::Attributes & attributes = shaderFragmentPolygon->getAttributes();
-            Shader::Attributes::const_iterator it = attributes.find("color");
+            const ShaderInfoL & shaderInfoL = shaderPolygon->getShaderInfo();
+            const ShaderInfo::Attributes & attributes = (*shaderInfoL.cbegin())->attributes;
+            ShaderInfo::Attributes::const_iterator it = attributes.find("color");
             if(it != attributes.cend())
                 iFunctions->glUniform4fv(it->second, 1, &item->getFill()[0]);
             float v[] = {0.95, 0.95};
@@ -343,7 +343,7 @@ void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
             }
             iFunctions->glEnd();
         }
-        iFunctions->glUseProgram(0);
+       iFunctions->glUseProgram(0);
     }
     else
     {
@@ -361,30 +361,28 @@ void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
 }
 
 
-
 void shaderRect(IFunctions * iFunctions,
-                Shader::Ptr & shaderVertexPolygon,
-                Shader::Ptr & shaderFragmentPolygon)
+                Shader::Ptr & shaderPolygon)
 {
-    const char * valueV = "void main() {\n"
-                          "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-                         " gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
+    ShaderInfoL shaderInfoL;
+    const char * value = "uniform vec4 color;\n"
+                         "uniform vec2 border;\n"
+                         "void main() {\n"
+                         " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
+                         " gl_FragColor = color;\n"
+                         " else\n"
+                         " gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n"
                          "}\n";
-
-    shaderVertexPolygon = Shader::Ptr(new Shader(iFunctions,
-                                                   valueV, Shader::VERTEX));
-
-    const char * valueF = "uniform vec4 color;\n"
-                          "uniform vec2 border;\n"
-                          "void main() {\n"
-                          " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
-                          " gl_FragColor = color;\n"
-                          " else\n"
-                          " gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n"
-                          "}\n";
-    Shader::Attributes attributes;
+    ShaderInfo::Attributes attributes;
     attributes["color"] = 0;
     attributes["border"] = 0;
-    shaderFragmentPolygon = Shader::Ptr(new Shader(iFunctions, valueF,
-                                                   Shader::FRAGMENT, attributes));
+    shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT, attributes)));
+
+    value = "void main() {\n"
+            "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
+            "gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
+            "}\n";
+    shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX)));
+
+    shaderPolygon = Shader::Ptr(new Shader(iFunctions, shaderInfoL));
 }
