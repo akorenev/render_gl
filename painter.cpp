@@ -82,7 +82,7 @@ void painter::setIFunctions(IFunctions *iFunctions)
 
 void painter::init_shaders()
 {
-    shaderRect(m_IFunctions, m_shaderPolygon);
+    //shaderRect(m_IFunctions, m_shaderPolygon);
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV,
@@ -337,13 +337,15 @@ void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
             float y[] = {-1,  1, 1, -1};
             for(const PointD & p : item->getPoints())
             {
-                iFunctions->glTexCoord2f(x[i], y[i]);
-                ++i;
+                iFunctions->glTexCoord2f(x[i], y[i++]);
+
+                const float* color = item->getFill();
+                iFunctions->glColor3f(0, 1, 0);
                 iFunctions->glVertex3d(p.x(), p.y(), p.z());
             }
             iFunctions->glEnd();
         }
-       iFunctions->glUseProgram(0);
+        iFunctions->glUseProgram(0);
     }
     else
     {
@@ -365,22 +367,25 @@ void shaderRect(IFunctions * iFunctions,
                 Shader::Ptr & shaderPolygon)
 {
     ShaderInfoL shaderInfoL;
-    const char * value = "uniform vec4 color;\n"
+    const char * value = "varying vec4 vColor;\n"
+                         "uniform vec4 color;\n"
                          "uniform vec2 border;\n"
                          "void main() {\n"
                          " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
                          " gl_FragColor = color;\n"
                          " else\n"
-                         " gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n"
+                         " gl_FragColor = vColor; \n"
                          "}\n";
     ShaderInfo::Attributes attributes;
     attributes["color"] = 0;
     attributes["border"] = 0;
     shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT, attributes)));
 
-    value = "void main() {\n"
+    value = "varying vec4 vColor;\n"
+            "void main() {\n"
             "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
             "gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
+            "vColor = gl_Color;"
             "}\n";
     shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX)));
 

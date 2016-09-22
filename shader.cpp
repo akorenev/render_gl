@@ -59,7 +59,7 @@ void Shader::init()
         }
         m_ifunctions->glShaderSource(shaderId, 1, &shaderInfo->value, NULL); // передать текст шейдера
         m_ifunctions->glCompileShader(shaderId); // скомпилировать шейдер
-
+        //m_ifunctions->glGetCo
         if(m_programId == 0)
             m_programId = m_ifunctions->glCreateProgram();
 
@@ -70,8 +70,12 @@ void Shader::init()
         m_ifunctions->glGetProgramiv(m_programId, GL_LINK_STATUS, &ok); // проверить сборку
         if(!ok)
         {
+            GLchar log[32768];
+            GLsizei length;
+            m_ifunctions->glGetShaderInfoLog(shaderId, 32768, &length, log );
             m_ifunctions->glDeleteShader(shaderId);
-            qDebug() << "error attach Shader";
+            qDebug() << "error attach Shader " << m_ifunctions->glGetError();
+            qDebug() << QString(log);
             continue;
         }
         for(ShaderInfo::Attributes::iterator it = shaderInfo->attributes.begin();

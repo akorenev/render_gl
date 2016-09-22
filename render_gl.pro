@@ -49,7 +49,7 @@ HEADERS  += widget.h \
     color.h \
     point.h \
     e_data/swap.h \
-    e_data/bumble_sort.h \
+    e_data/bubble_sort.h \
     e_data/heap_sort.h \
     ray.h \
     boundingbox.h \

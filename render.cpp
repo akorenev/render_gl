@@ -39,37 +39,36 @@ void render::draw()
                               m_background.greenF(),
                               m_background.blueF(),
                               m_background.alphaF());
-    m_IFunctions.glMatrixMode(GL_PROJECTION);
+//    m_IFunctions.glMatrixMode(GL_PROJECTION);
 
     QMatrix4x4 mProjection;
     mProjection.setToIdentity();
     mProjection.perspective(45, m_ratio, 1, 10000);
 
-//    QMatrix4x4 mModelViewMatrix;
-//    mModelViewMatrix.setToIdentity();
-//    mModelViewMatrix.translate(m_currentPos.x(), m_currentPos.y(), m_boundingBox.min.z());
-//    mModelViewMatrix.scale(m_zoom);
-//    mModelViewMatrix.rotate(m_rotate_x, 1.0, 0.0, 0.0);
-//    mModelViewMatrix.rotate(m_rotate_y, 0.0, 1.0, 0.0);
-//    mModelViewMatrix.rotate(m_rotate_z, 0.0, 0.0, 1.0);
+    QMatrix4x4 mModelViewMatrix;
+    mModelViewMatrix.setToIdentity();
+    mModelViewMatrix.translate(m_currentPos.x(), m_currentPos.y(), m_boundingBox.min.z());
+    mModelViewMatrix.scale(m_zoom);
+    mModelViewMatrix.rotate(m_rotate_x, 1.0, 0.0, 0.0);
+    mModelViewMatrix.rotate(m_rotate_y, 0.0, 1.0, 0.0);
+    mModelViewMatrix.rotate(m_rotate_z, 0.0, 0.0, 1.0);
 
-//    mProjection *= mModelViewMatrix;
+    mProjection *= mModelViewMatrix;
+    m_IFunctions.glUseProgram(m_shader->getProgramId());
+    const ShaderInfoL & shaderInfoL = m_shader->getShaderInfo();
+    const ShaderInfo::Attributes & attributes = (*shaderInfoL.cbegin())->attributes;
+    ShaderInfo::Attributes::const_iterator it = attributes.find("matrix");
+    if(it != attributes.cend())
+        m_IFunctions.glUniformMatrix4fv(it->second, 1, 0, mProjection.data());
 
-//    m_IFunctions.glUseProgram(m_shader->getProgramId());
-//    const ShaderInfoL & shaderInfoL = m_shader->getShaderInfo();
-//    const ShaderInfo::Attributes & attributes = (*shaderInfoL.cbegin())->attributes;
-//    ShaderInfo::Attributes::const_iterator it = attributes.find("matrix");
-//    if(it != attributes.cend())
-//        m_IFunctions.glUniformMatrix4fv(it->second, 1, 0, mProjection.data());
-
-    m_IFunctions.glLoadMatrixf(mProjection.data());
-    m_IFunctions.glMatrixMode(GL_MODELVIEW);
-    m_IFunctions.glLoadIdentity();
-    m_IFunctions.glTranslated(m_currentPos.x(), m_currentPos.y(), m_boundingBox.min.z());
-    m_IFunctions.glScaled(m_zoom, m_zoom, m_zoom);
-    m_IFunctions.glRotated(m_rotate_x, 1.0, 0.0, 0.0);
-    m_IFunctions.glRotated(m_rotate_y, 0.0, 1.0, 0.0);
-    m_IFunctions.glRotated(m_rotate_z, 0.0, 0.0, 1.0);
+//    m_IFunctions.glLoadMatrixf(mProjection.data());
+//    m_IFunctions.glMatrixMode(GL_MODELVIEW);
+//    m_IFunctions.glLoadIdentity();
+//    m_IFunctions.glTranslated(m_currentPos.x(), m_currentPos.y(), m_boundingBox.min.z());
+//    m_IFunctions.glScaled(m_zoom, m_zoom, m_zoom);
+//    m_IFunctions.glRotated(m_rotate_x, 1.0, 0.0, 0.0);
+//    m_IFunctions.glRotated(m_rotate_y, 0.0, 1.0, 0.0);
+//    m_IFunctions.glRotated(m_rotate_z, 0.0, 0.0, 1.0);
 
     for(auto & v : m_painterL)
         v->draw();
@@ -91,16 +90,23 @@ void render::init()
     ShaderInfoL shaderInfoL;
     ShaderInfo::Attributes attributes;
     attributes["matrix"] = 0;
-    const char * value = "uniform mat4 matrix;\n"
-                         "void main(){\n"
-                         "gl_Position = matrix * gl_Vertex;\n"
-                         "}\n";
+
+    const char *  value =
+            "varying vec4 fgh;\n"
+            "uniform mat4 matrix;\n"
+            "void main(){\n"
+            "gl_Position = matrix * gl_Vertex;\n"
+            "fgh = gl_Color;\n"
+            "}\n";
+    //
     shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX, attributes)));
 
-    value = "void main(){\n"
-            "gl_FragColor = gl_Color;\n"
+    value = "varying vec4 fgh;\n"
+            "void main(){\n"
+            "gl_FragColor = fgh;\n"
             "}\n";
     shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT)));
+
 
     m_shader = Shader::Ptr(new Shader(&m_IFunctions, shaderInfoL));
 }

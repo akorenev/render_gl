@@ -74,57 +74,57 @@ void Widget::initializeGL()
         itemUS.insert(polygonItem);
     }
 
-    Model modelImage(0);
-    qimagedriver imagedriver;
-    if(imagedriver.load(&modelImage, ":/test1"))
-       itemUS = cmerge(itemUS, modelImage.getItemL());
+//    Model modelImage(0);
+//    qimagedriver imagedriver;
+//    if(imagedriver.load(&modelImage, ":/test1"))
+//       itemUS = cmerge(itemUS, modelImage.getItemL());
 
 
-    ImageItem * imageItem = (ImageItem*)*modelImage.getItemL().begin();
+//    ImageItem * imageItem = (ImageItem*)*modelImage.getItemL().begin();
 
-    double k = 50;
-    CubeItem * item = new CubeItem();
-    item->setSide(CubeItem::BACK, CubeItem::SIDE(PointD(-k, k, -k),
-                                                 PointD(k, k, -k),
-                                                 PointD(k, -k, -k),
-                                                 PointD(-k, -k, -k),
-                                                 ColorD(1.0, 0, 0)));
-    item->getSide(CubeItem::BACK).setTexture(new ImageItem(*imageItem));
+//    double k = 50;
+//    CubeItem * item = new CubeItem();
+//    item->setSide(CubeItem::BACK, CubeItem::SIDE(PointD(-k, k, -k),
+//                                                 PointD(k, k, -k),
+//                                                 PointD(k, -k, -k),
+//                                                 PointD(-k, -k, -k),
+//                                                 ColorD(1.0, 0, 0)));
+//    item->getSide(CubeItem::BACK).setTexture(new ImageItem(*imageItem));
 
-    item->setSide(CubeItem::RIGHT, CubeItem::SIDE(PointD(k, -k, -k),
-                                                  PointD(k, k, -k),
-                                                  PointD(k, k, k),
-                                                  PointD(k, -k, k),
-                                                  ColorD(0, 1.0, 0)));
-    item->getSide(CubeItem::RIGHT).setTexture(new ImageItem(*imageItem));
-    item->setSide(CubeItem::LEFT, CubeItem::SIDE(PointD(-k, -k, k),
-                                                 PointD(-k, k, k),
-                                                 PointD(-k, k, -k),
-                                                 PointD(-k, -k, -k),
-                                                 ColorD(0, 0, 1.0)));
-    item->getSide(CubeItem::LEFT).setTexture(new ImageItem(*imageItem));
+//    item->setSide(CubeItem::RIGHT, CubeItem::SIDE(PointD(k, -k, -k),
+//                                                  PointD(k, k, -k),
+//                                                  PointD(k, k, k),
+//                                                  PointD(k, -k, k),
+//                                                  ColorD(0, 1.0, 0)));
+//    item->getSide(CubeItem::RIGHT).setTexture(new ImageItem(*imageItem));
+//    item->setSide(CubeItem::LEFT, CubeItem::SIDE(PointD(-k, -k, k),
+//                                                 PointD(-k, k, k),
+//                                                 PointD(-k, k, -k),
+//                                                 PointD(-k, -k, -k),
+//                                                 ColorD(0, 0, 1.0)));
+//    item->getSide(CubeItem::LEFT).setTexture(new ImageItem(*imageItem));
 
-    item->setSide(CubeItem::FRONT, CubeItem::SIDE(PointD(k, -k, k),
-                                                  PointD(k, k, k),
-                                                  PointD(-k, k, k),
-                                                  PointD(-k, -k, k),
-                                                  ColorD(1.0, 1.0, 1.0)));
-    item->getSide(CubeItem::FRONT).setTexture(new ImageItem(*imageItem));
+//    item->setSide(CubeItem::FRONT, CubeItem::SIDE(PointD(k, -k, k),
+//                                                  PointD(k, k, k),
+//                                                  PointD(-k, k, k),
+//                                                  PointD(-k, -k, k),
+//                                                  ColorD(1.0, 1.0, 1.0)));
+//    item->getSide(CubeItem::FRONT).setTexture(new ImageItem(*imageItem));
 
-    item->setSide(CubeItem::BOTTOM, CubeItem::SIDE(PointD(k, -k, -k),
-                                                   PointD(k, -k, k),
-                                                   PointD(-k, -k, k),
-                                                   PointD(-k, -k, -k),
-                                                   ColorD(1.0, 1.0, 0)));
-    item->getSide(CubeItem::BOTTOM).setTexture(new ImageItem(*imageItem));
+//    item->setSide(CubeItem::BOTTOM, CubeItem::SIDE(PointD(k, -k, -k),
+//                                                   PointD(k, -k, k),
+//                                                   PointD(-k, -k, k),
+//                                                   PointD(-k, -k, -k),
+//                                                   ColorD(1.0, 1.0, 0)));
+//    item->getSide(CubeItem::BOTTOM).setTexture(new ImageItem(*imageItem));
 
-    item->setSide(CubeItem::TOP, CubeItem::SIDE(PointD(k, k, k),
-                                                PointD(k, k, -k),
-                                                PointD(-k, k, -k),
-                                                PointD(-k, k, k),
-                                                ColorD(1.0, 0, 1.0)));
-    item->getSide(CubeItem::TOP).setTexture(new ImageItem(*imageItem));
-    itemUS.insert(item);
+//    item->setSide(CubeItem::TOP, CubeItem::SIDE(PointD(k, k, k),
+//                                                PointD(k, k, -k),
+//                                                PointD(-k, k, -k),
+//                                                PointD(-k, k, k),
+//                                                ColorD(1.0, 0, 1.0)));
+//    item->getSide(CubeItem::TOP).setTexture(new ImageItem(*imageItem));
+//    itemUS.insert(item);
 
 //    CubeItem * item_2 = new CubeItem(*item);
 //    item_2->setPos(PointD(500, 0));
