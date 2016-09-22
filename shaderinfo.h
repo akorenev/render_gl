@@ -1,7 +1,7 @@
 #ifndef SHADERINFO_H
 #define SHADERINFO_H
 #include <map>
-#include <list>
+#include <vector>
 #include <memory>
 
 struct ShaderInfo
@@ -21,12 +21,19 @@ struct ShaderInfo
         , attributes(_attributes)
         , type(_type)
         , shaderId(0){}
+    int getKeyAttribute(const char * nameAttribute) const
+    {
+        ShaderInfo::Attributes::const_iterator it = attributes.find(nameAttribute);
+        if(it != attributes.cend())
+            return it->second;
+        return -1;
+    }
 
     const char * value;
     Attributes attributes;
     Type type;
     unsigned int shaderId;
 };
-typedef std::list<ShaderInfo::Ptr> ShaderInfoL;
+typedef std::vector<ShaderInfo::Ptr> ShaderInfoV;
 
 #endif // SHADERINFO_H

@@ -7,8 +7,8 @@ Shader::Shader()
 {}
 
 Shader::Shader(IFunctions * ifunctions,
-               const ShaderInfoL & shaderInfoL)
-    : m_shaderInfoL(shaderInfoL)
+               const ShaderInfoV & shaderInfoV)
+    : m_shaderInfoV(shaderInfoV)
     , m_ifunctions(ifunctions)
     , m_programId(0)
 {
@@ -17,23 +17,23 @@ Shader::Shader(IFunctions * ifunctions,
 
 Shader::~Shader()
 {
-    ShaderInfoL::iterator it = m_shaderInfoL.begin();
-    while(it != m_shaderInfoL.end())
+    ShaderInfoV::iterator it = m_shaderInfoV.begin();
+    while(it != m_shaderInfoV.end())
     {
         m_ifunctions->glDeleteShader((*it)->shaderId);
-        it = m_shaderInfoL.erase(it);
+        it = m_shaderInfoV.erase(it);
     }
     m_ifunctions->glDeleteProgram(m_programId);
 }
 
-void Shader::setShaderInfo(const ShaderInfoL &shaderInfoL)
+void Shader::setShaderInfo(const ShaderInfoV &shaderInfoV)
 {
-    m_shaderInfoL = shaderInfoL;
+    m_shaderInfoV = shaderInfoV;
 }
 
-const ShaderInfoL &Shader::getShaderInfo() const
+const ShaderInfoV &Shader::getShaderInfo() const
 {
-    return m_shaderInfoL;
+    return m_shaderInfoV;
 }
 
 unsigned int Shader::getProgramId()
@@ -43,7 +43,7 @@ unsigned int Shader::getProgramId()
 
 void Shader::init()
 {
-    for(auto & shaderInfo : m_shaderInfoL)
+    for(auto & shaderInfo : m_shaderInfoV)
     {
         unsigned int shaderId = 0;
         switch(shaderInfo->type)
@@ -57,9 +57,10 @@ void Shader::init()
         default:
             continue;
         }
+        shaderInfo->shaderId = shaderId;
         m_ifunctions->glShaderSource(shaderId, 1, &shaderInfo->value, NULL); // передать текст шейдера
         m_ifunctions->glCompileShader(shaderId); // скомпилировать шейдер
-        //m_ifunctions->glGetCo
+
         if(m_programId == 0)
             m_programId = m_ifunctions->glCreateProgram();
 
@@ -76,8 +77,11 @@ void Shader::init()
             m_ifunctions->glDeleteShader(shaderId);
             qDebug() << "error attach Shader " << m_ifunctions->glGetError();
             qDebug() << QString(log);
-            continue;
         }
+    }
+
+    for(auto & shaderInfo : m_shaderInfoV)
+    {
         for(ShaderInfo::Attributes::iterator it = shaderInfo->attributes.begin();
             it != shaderInfo->attributes.end(); ++it)
         {

@@ -27,7 +27,7 @@ class painter : public ipainter
 public:
     painter();
     ~painter();
-    void draw();
+    void draw(IPainterInfo::Ptr painterInfo);
     void setIFunctions(IFunctions * iFunctions);
 private:
     void init_shaders();
@@ -45,6 +45,6 @@ void drawCubes(const std::vector<CubeItem *> & cubeItemV,
                IFunctions * iFunctions, CubeTextures & cubeTextures);
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
                   Shader::Ptr shaderPolygon,
-                  IFunctions * iFunctions);
+                  IFunctions * iFunctions, IPainterInfo::Ptr painterInfo);
 
 #endif // PAINTER_H

@@ -11,14 +11,14 @@ public:
     typedef std::shared_ptr<Shader> Ptr;
 public:
     Shader();
-    Shader(IFunctions * ifunctions, const ShaderInfoL & shaderInfoL);
+    Shader(IFunctions * ifunctions, const ShaderInfoV & shaderInfoV);
     ~Shader();
-    void setShaderInfo(const ShaderInfoL & shaderInfoL);
-    const ShaderInfoL & getShaderInfo() const;
+    void setShaderInfo(const ShaderInfoV & shaderInfoV);
+    const ShaderInfoV & getShaderInfo() const;
     unsigned int getProgramId();
     void init();
 private:
-    ShaderInfoL m_shaderInfoL;
+    ShaderInfoV m_shaderInfoV;
     IFunctions * m_ifunctions;
     unsigned int m_programId;
 };

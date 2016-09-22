@@ -54,12 +54,12 @@ void render::draw()
     mModelViewMatrix.rotate(m_rotate_z, 0.0, 0.0, 1.0);
 
     mProjection *= mModelViewMatrix;
+    m_painterInfo->pushMatrix(mProjection);
     m_IFunctions.glUseProgram(m_shader->getProgramId());
-    const ShaderInfoL & shaderInfoL = m_shader->getShaderInfo();
-    const ShaderInfo::Attributes & attributes = (*shaderInfoL.cbegin())->attributes;
-    ShaderInfo::Attributes::const_iterator it = attributes.find("matrix");
-    if(it != attributes.cend())
-        m_IFunctions.glUniformMatrix4fv(it->second, 1, 0, mProjection.data());
+    const ShaderInfoV & shaderInfoV = m_shader->getShaderInfo();
+    int matrixId = shaderInfoV[0]->getKeyAttribute("matrix");
+    if(matrixId != -1)
+        m_IFunctions.glUniformMatrix4fv(matrixId, 1, 0, mProjection.data());
 
 //    m_IFunctions.glLoadMatrixf(mProjection.data());
 //    m_IFunctions.glMatrixMode(GL_MODELVIEW);
@@ -71,10 +71,12 @@ void render::draw()
 //    m_IFunctions.glRotated(m_rotate_z, 0.0, 0.0, 1.0);
 
     for(auto & v : m_painterL)
-        v->draw();
+        v->draw(m_painterInfo);
 
     m_IFunctions.glUseProgram(0);
     m_IFunctions.glFlush();
+    while(!m_painterInfo->emptyMatrix())
+        m_painterInfo->popMatrix();
 }
 
 void render::init()
@@ -87,28 +89,29 @@ void render::init()
 
     m_IFunctions.glEnable(GL_DEPTH_TEST);
 
-    ShaderInfoL shaderInfoL;
+    ShaderInfoV shaderInfoV;
     ShaderInfo::Attributes attributes;
     attributes["matrix"] = 0;
 
     const char *  value =
-            "varying vec4 fgh;\n"
+            "varying vec4 vColor;\n"
             "uniform mat4 matrix;\n"
             "void main(){\n"
             "gl_Position = matrix * gl_Vertex;\n"
-            "fgh = gl_Color;\n"
+            "vColor = gl_Color;\n"
             "}\n";
-    //
-    shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX, attributes)));
+    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX, attributes)));
 
-    value = "varying vec4 fgh;\n"
+    value = "varying vec4 vColor;\n"
             "void main(){\n"
-            "gl_FragColor = fgh;\n"
+            "gl_FragColor = vColor;\n"
             "}\n";
-    shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT)));
+    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT)));
 
 
-    m_shader = Shader::Ptr(new Shader(&m_IFunctions, shaderInfoL));
+    m_shader = Shader::Ptr(new Shader(&m_IFunctions, shaderInfoV));
+
+    m_painterInfo = IPainterInfo::Ptr(new IPainterInfo());
 }
 
 void render::resize(int w, int h)

@@ -28,7 +28,7 @@ painter::~painter()
     }
 }
 
-void painter::draw()
+void painter::draw(IPainterInfo::Ptr painterInfo)
 {
     std::vector<PointItem> pointItemV;
     std::vector<PolygonItem*> polygonItemV;
@@ -65,7 +65,7 @@ void painter::draw()
     if(pointItemV.size() > 0)
         drawPoints(pointItemV, m_IFunctions);
     if(polygonItemV.size() > 0)
-        drawPolygons(polygonItemV, m_shaderPolygon, m_IFunctions);
+        drawPolygons(polygonItemV, m_shaderPolygon, m_IFunctions, painterInfo);
     if(imageItemV.size() > 0)
         drawImages(imageItemV, m_IFunctions, m_imageTextures);
     if(cubeItemV.size() > 0)
@@ -82,7 +82,7 @@ void painter::setIFunctions(IFunctions *iFunctions)
 
 void painter::init_shaders()
 {
-    //shaderRect(m_IFunctions, m_shaderPolygon);
+    shaderRect(m_IFunctions, m_shaderPolygon);
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV,
@@ -315,32 +315,35 @@ void drawCubes(const std::vector<CubeItem *> & cubeItemV,
 
 void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
                   Shader::Ptr shaderPolygon,
-                  IFunctions * iFunctions)
+                  IFunctions * iFunctions, IPainterInfo::Ptr painterInfo)
 {
     if(shaderPolygon)
     {
         iFunctions->glUseProgram(shaderPolygon->getProgramId());
         for(PolygonItem * item : polygonItemV)
         {
-            const ShaderInfoL & shaderInfoL = shaderPolygon->getShaderInfo();
-            const ShaderInfo::Attributes & attributes = (*shaderInfoL.cbegin())->attributes;
-            ShaderInfo::Attributes::const_iterator it = attributes.find("color");
-            if(it != attributes.cend())
-                iFunctions->glUniform4fv(it->second, 1, &item->getFill()[0]);
-            float v[] = {0.95, 0.95};
-            it = attributes.find("border");
-            if(it != attributes.cend())
-                iFunctions->glUniform2fv(it->second, 1, &v[0]);
+            const ShaderInfoV & shaderInfoV = shaderPolygon->getShaderInfo();
+            int matrixId = shaderInfoV[1]->getKeyAttribute("matrix");
+            if(matrixId != -1)
+                iFunctions->glUniformMatrix4fv(matrixId, 1, 0, painterInfo->topMatrix().data());
+            int colorId = shaderInfoV[0]->getKeyAttribute("color");
+            if(colorId != -1)
+                iFunctions->glUniform4fv(colorId, 1, &item->getFill()[0]);
+            float v[] = {0.8, 0.8};
+            int borderId = shaderInfoV[0]->getKeyAttribute("border");
+            if(borderId != -1)
+                iFunctions->glUniform2fv(borderId, 1, &v[0]);
+
             iFunctions->glBegin(GL_POLYGON);
             int i = 0;
             float x[] = {-1, -1, 1,  1};
             float y[] = {-1,  1, 1, -1};
             for(const PointD & p : item->getPoints())
             {
-                iFunctions->glTexCoord2f(x[i], y[i++]);
-
-                const float* color = item->getFill();
-                iFunctions->glColor3f(0, 1, 0);
+                iFunctions->glTexCoord2f(x[i], y[i]);
+                ++i;
+//                const float* color = item->getFill();
+//                iFunctions->glColor3f(0, 1, 0);
                 iFunctions->glVertex3d(p.x(), p.y(), p.z());
             }
             iFunctions->glEnd();
@@ -366,28 +369,37 @@ void drawPolygons(const std::vector<PolygonItem*> &polygonItemV,
 void shaderRect(IFunctions * iFunctions,
                 Shader::Ptr & shaderPolygon)
 {
-    ShaderInfoL shaderInfoL;
-    const char * value = "varying vec4 vColor;\n"
+    ShaderInfoV shaderInfoV;
+
+
+    ShaderInfo::Attributes attributes;
+    const char * value = "varying vec4 firstColor;\n"
                          "uniform vec4 color;\n"
                          "uniform vec2 border;\n"
                          "void main() {\n"
                          " if ((abs(gl_TexCoord[0].x) < border.x) && (abs(gl_TexCoord[0].y) < border.y))  \n"
-                         " gl_FragColor = color;\n"
+                         " gl_FragColor = firstColor;\n"
                          " else\n"
-                         " gl_FragColor = vColor; \n"
+                         " gl_FragColor = color;"
+
                          "}\n";
-    ShaderInfo::Attributes attributes;
+
     attributes["color"] = 0;
     attributes["border"] = 0;
-    shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT, attributes)));
+    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT, attributes)));
 
-    value = "varying vec4 vColor;\n"
+    attributes.clear();
+    attributes["matrix"] = 0;
+    value = "varying vec4 firstColor;\n"
+            "uniform mat4 matrix;\n"
             "void main() {\n"
+            "gl_Position = matrix * gl_Vertex; \n"
             "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-            "gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; \n"
-            "vColor = gl_Color;"
+            "firstColor = gl_Color;"
             "}\n";
-    shaderInfoL.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX)));
+    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX, attributes)));
 
-    shaderPolygon = Shader::Ptr(new Shader(iFunctions, shaderInfoL));
+
+
+    shaderPolygon = Shader::Ptr(new Shader(iFunctions, shaderInfoV));
 }

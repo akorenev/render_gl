@@ -19,7 +19,7 @@ void plypainter::setModel(Model *model)
     ipainter::setModel(model);
 }
 
-void plypainter::draw()
+void plypainter::draw(IPainterInfo::Ptr painterInfo)
 {
     double * vertexes = m_plymodel->getVertexes();
     unsigned int vertexesSize = m_plymodel->getVertexesSize();

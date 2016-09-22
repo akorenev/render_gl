@@ -10,7 +10,7 @@ public:
     plypainter();
     ~plypainter();
     void setModel(Model * model);
-    void draw();
+    void draw(IPainterInfo::Ptr painterInfo);
 private:
     PlyModel * m_plymodel;
     GLuint m_vertex_i;
