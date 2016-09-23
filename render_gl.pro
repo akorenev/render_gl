@@ -13,7 +13,7 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-LIBS += -lGLU
+#LIBS += -lGLU
 
 SOURCES += main.cpp\
         widget.cpp \

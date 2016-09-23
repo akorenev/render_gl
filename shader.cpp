@@ -75,7 +75,6 @@ void Shader::init()
             GLsizei length;
             m_ifunctions->glGetShaderInfoLog(shaderId, 32768, &length, log );
             m_ifunctions->glDeleteShader(shaderId);
-            qDebug() << "error attach Shader " << m_ifunctions->glGetError();
             qDebug() << QString(log);
         }
     }

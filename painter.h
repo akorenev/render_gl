@@ -34,9 +34,11 @@ private:
     ImageTextures m_imageTextures;
     CubeTextures m_cubeTextures;
     Shader::Ptr m_shaderPolygon;
+    Shader::Ptr m_shaderPoint;
 };
 
-void drawPoints(const std::vector<PointItem> &pointItemV, IFunctions * iFunctions);
+void drawPoints(const std::vector<PointItem> &pointItemV, Shader::Ptr shaderPoint,
+                IFunctions * iFunctions, IPainterInfo::Ptr painterInfo);
 void drawOctoModel(OctoModel * model, IFunctions * iFunctions);
 void drawImages(const std::vector<ImageItem *> &imageItemV,
                 IFunctions * iFunctions,

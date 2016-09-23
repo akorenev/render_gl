@@ -31,7 +31,7 @@ void Widget::initializeGL()
 
     ItemUS itemUS;
 
-    for(int i = 0; i < 100; ++i)
+    for(int i = 0; i < 1; ++i)
     {
         PointItem * pointItem = new PointItem();
         PointD p;
