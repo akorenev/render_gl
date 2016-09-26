@@ -33,6 +33,7 @@ render::~render()
 }
 
 static GLuint programObject = 0;
+static int idMatrix = -1;
 
 void render::draw()
 {
@@ -44,19 +45,20 @@ void render::draw()
                               m_background.alphaF());
 //    m_IFunctions.glMatrixMode(GL_PROJECTION);
 
-//    QMatrix4x4 mProjection;
-//    mProjection.setToIdentity();
-//    mProjection.perspective(45, m_ratio, 1, 10000);
+    QMatrix4x4 mProjection;
+    mProjection.setToIdentity();
+    mProjection.perspective(45, 1, 1, 1000);
+//    mProjection.ortho(-2.0, 2.0, -2.0, 2.0, -1, 1);
 
-//    QMatrix4x4 mModelViewMatrix;
-//    mModelViewMatrix.setToIdentity();
-//    mModelViewMatrix.translate(m_currentPos.x(), m_currentPos.y(), m_boundingBox.min.z());
-//    mModelViewMatrix.scale(m_zoom);
-//    mModelViewMatrix.rotate(m_rotate_x, 1.0, 0.0, 0.0);
-//    mModelViewMatrix.rotate(m_rotate_y, 0.0, 1.0, 0.0);
-//    mModelViewMatrix.rotate(m_rotate_z, 0.0, 0.0, 1.0);
+    QMatrix4x4 mModelViewMatrix;
+    mModelViewMatrix.setToIdentity();
+    mModelViewMatrix.translate(0, 0, -2);
+    mModelViewMatrix.scale(m_zoom);
+    mModelViewMatrix.rotate(m_rotate_x, 1.0, 0.0, 0.0);
+    mModelViewMatrix.rotate(m_rotate_y, 0.0, 1.0, 0.0);
+    mModelViewMatrix.rotate(m_rotate_z, 0.0, 0.0, 1.0);
 
-//    mProjection *= mModelViewMatrix;
+    mProjection *= mModelViewMatrix;
 //    m_painterInfo->pushMatrix(mProjection);
 //    m_IFunctions.glUseProgram(m_shader->getProgramId());
 //    const ShaderInfoV & shaderInfoV = m_shader->getShaderInfo();
@@ -81,6 +83,7 @@ void render::draw()
     // Use the program object
     m_IFunctions.glUseProgram(programObject);
     // Load the vertex data
+    m_IFunctions.glUniformMatrix4fv(idMatrix, 1, 0, mProjection.data());
     m_IFunctions.glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
     m_IFunctions.glEnableVertexAttribArray(0);
     m_IFunctions.glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -168,9 +171,10 @@ void render::init()
             "precision mediump float;\n"
             "#endif \n"
             "attribute vec4 vPosition; \n"
+            "uniform mat4 matrix;"
             "void main() \n"
             "{ \n"
-            " gl_Position = vPosition; \n"
+            " gl_Position = matrix *vPosition; \n"
             "} \n";
 
     const char * fShaderStr =
@@ -200,6 +204,7 @@ void render::init()
     m_IFunctions.glBindAttribLocation(programObject, 0, "vPosition");
     // Link the program
     m_IFunctions.glLinkProgram(programObject);
+    idMatrix = m_IFunctions.glGetUniformLocation(programObject, "matrix");
     // Check the link status
     m_IFunctions.glGetProgramiv(programObject, GL_LINK_STATUS, &linked);
     if(!linked)
