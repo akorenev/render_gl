@@ -34,6 +34,7 @@ public:
     void releaseMouse();
 private:
     void calculateBoundingBox();
+    GLuint loadShader(const char * value, GLenum type);
 signals:
     void update();
 private:
