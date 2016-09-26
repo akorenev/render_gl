@@ -85,7 +85,7 @@ void painter::setIFunctions(IFunctions *iFunctions)
 void painter::init_shaders()
 {
     //shaderRect(m_IFunctions, m_shaderPolygon);
-    shaderPoint(m_IFunctions, m_shaderPoint);
+    //shaderPoint(m_IFunctions, m_shaderPoint);
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV, Shader::Ptr shaderPoint,
