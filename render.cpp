@@ -120,6 +120,7 @@ GLuint render::loadShader(const char * value, GLenum type)
         {
             char* infoLog = (char*)malloc(sizeof(char) * infoLen);
             m_IFunctions.glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
+            qDebug() << " info log " << QString(infoLog);
             free(infoLog);
         }
         m_IFunctions.glDeleteShader(shader);
@@ -162,6 +163,10 @@ void render::init()
 
     m_painterInfo = IPainterInfo::Ptr(new IPainterInfo());
     const char * vShaderStr =
+            "#ifdef GL_ES \n"
+            "precision mediump int;\n"
+            "precision mediump float;\n"
+            "#endif \n"
             "attribute vec4 vPosition; \n"
             "void main() \n"
             "{ \n"
@@ -169,10 +174,13 @@ void render::init()
             "} \n";
 
     const char * fShaderStr =
-            "precision mediump float; \n"
+            "#ifdef GL_ES \n"
+            "precision mediump int;\n"
+            "precision mediump float;\n"
+            "#endif \n"
             "void main() \n"
             "{ \n"
-            " gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
+            " gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); \n"
             "} \n";
     GLuint vertexShader;
     GLuint fragmentShader;
