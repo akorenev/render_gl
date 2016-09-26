@@ -85,6 +85,8 @@ void render::draw()
     // Load the vertex data
     m_IFunctions.glUniformMatrix4fv(idMatrix, 1, 0, mProjection.data());
     m_IFunctions.glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+    float color[] = {1.0, 0.0, 0.0, 1.0};
+    m_IFunctions.glVertexAttrib4fv(1, &color[0]);
     m_IFunctions.glEnableVertexAttribArray(0);
     m_IFunctions.glDrawArrays(GL_TRIANGLES, 0, 3);
     //    for(auto & v : m_painterL)
@@ -171,10 +173,13 @@ void render::init()
             "precision mediump float;\n"
             "#endif \n"
             "attribute vec4 vPosition; \n"
-            "uniform mat4 matrix;"
+            "attribute vec4 vColor;\n"
+            "uniform mat4 matrix; \n"
+            "varying vec4 rColor;\n"
             "void main() \n"
             "{ \n"
-            " gl_Position = matrix *vPosition; \n"
+            " gl_Position = matrix * vPosition; \n"
+            " rColor = vColor; \n"
             "} \n";
 
     const char * fShaderStr =
@@ -182,9 +187,10 @@ void render::init()
             "precision mediump int;\n"
             "precision mediump float;\n"
             "#endif \n"
+            "varying vec4 rColor;\n"
             "void main() \n"
             "{ \n"
-            " gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); \n"
+            " gl_FragColor = rColor; \n"
             "} \n";
     GLuint vertexShader;
     GLuint fragmentShader;
@@ -202,6 +208,7 @@ void render::init()
     m_IFunctions.glAttachShader(programObject, fragmentShader);
     // Bind vPosition to attribute 0
     m_IFunctions.glBindAttribLocation(programObject, 0, "vPosition");
+    m_IFunctions.glBindAttribLocation(programObject, 1, "vColor");
     // Link the program
     m_IFunctions.glLinkProgram(programObject);
     idMatrix = m_IFunctions.glGetUniformLocation(programObject, "matrix");
