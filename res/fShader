@@ -1,0 +1,13 @@
+#ifdef GL_ES
+precision mediump int;
+precision mediump float;
+#endif
+attribute vec4 vPosition;
+attribute vec4 vColor;
+uniform mat4 matrix;
+varying vec4 rColor;
+void main()
+{
+  gl_Position = matrix * vPosition;
+  rColor = vColor;
+}
