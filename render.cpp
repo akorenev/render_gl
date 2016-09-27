@@ -15,7 +15,6 @@ render::render()
     : m_width(0)
     , m_height(0)
     , m_zoom(1.0)
-    , m_zoomStep(1.15)
     , m_background(QColor(200, 200, 200))
     , m_rotate_y(0.0)
     , m_rotate_x(0.0)
@@ -47,7 +46,7 @@ void render::draw()
 
     QMatrix4x4 mProjection;
     mProjection.setToIdentity();
-    mProjection.perspective(45, 1, 1, 1000);
+    mProjection.perspective(45, m_ratio, 1, 1000);
 //    mProjection.ortho(-2.0, 2.0, -2.0, 2.0, -1, 1);
 
     QMatrix4x4 mModelViewMatrix;
@@ -243,18 +242,18 @@ void render::resize(int w, int h)
 //    QMatrix4x4 m;
 //    m.setToIdentity();
 //    m.perspective(45, m_ratio, 1, 10000);
-//    m_IFunctions.glLoadMatrixf(m.data());
+    //    m_IFunctions.glLoadMatrixf(m.data());
 }
 
-void render::updateZoom(int delta)
+void render::setZoom(const double & zoom)
 {
-    if(delta > 0)
-        m_zoom *= m_zoomStep;
-    else
-        m_zoom /= m_zoomStep;
-
-    draw();
+    m_zoom = zoom;
     emit update();
+}
+
+const double &render::getZoom() const
+{
+    return m_zoom;
 }
 
 void render::updatePosition(int x, int y, int _x, int _y)

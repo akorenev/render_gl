@@ -18,6 +18,8 @@ private:
     int m_x;
     int m_y;
     PointD m_pos;
+    double m_totalScaleFactor;
+    double m_zoomStep;
 };
 
 #endif // FILTER_H

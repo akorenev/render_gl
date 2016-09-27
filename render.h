@@ -19,7 +19,9 @@ public:
     void draw();
     void init();
     void resize(int w, int h);
-    void updateZoom(int delta);
+    void setZoom(const double & zoom);
+    const double & getZoom() const;
+
     void updatePosition(int x, int y, int _x, int _y);
     const PointD & getPos() const;
     void addModel(Model * model);
@@ -42,7 +44,6 @@ private:
     int m_width;
     int m_height;
     double m_zoom;
-    double m_zoomStep;
     double m_ratio;
     BoundingBox m_boundingBox;
     QColor m_background;

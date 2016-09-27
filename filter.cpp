@@ -3,11 +3,16 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QTouchEvent>
+#include <QLineF>
 
 Filter::Filter(draw::render *render, QObject *parent)
     : QObject(parent)
     , m_render(render)
-    , m_pressLeftButton(false){}
+    , m_pressLeftButton(false)
+    , m_totalScaleFactor(1.0)
+    , m_zoomStep(1.15)
+{}
 
 bool Filter::eventFilter(QObject *obj, QEvent *e)
 {
@@ -17,7 +22,12 @@ bool Filter::eventFilter(QObject *obj, QEvent *e)
     case QEvent::Wheel:
     {
         QWheelEvent * event = static_cast<QWheelEvent*>(e);
-        m_render->updateZoom(event->delta());
+        double zoom = m_render->getZoom();
+        if(event->delta() > 0)
+            zoom *= m_zoomStep;
+        else
+            zoom /= m_zoomStep;
+        m_render->setZoom(zoom);
     }break;
     case QEvent::MouseMove:
     {
@@ -79,6 +89,30 @@ bool Filter::eventFilter(QObject *obj, QEvent *e)
             break;
         }
 
+    } break;
+    case QEvent::TouchBegin:
+    case QEvent::TouchEnd:
+    case QEvent::TouchUpdate:
+    {
+        QTouchEvent * event = static_cast<QTouchEvent*>(e);
+        QList<QTouchEvent::TouchPoint> points = event->touchPoints();
+        if(points.count() == 2)
+        {
+            const QTouchEvent::TouchPoint &p1 = points.first();
+            const QTouchEvent::TouchPoint &p2 = points.last();
+            qreal currentScaleFactor =
+                    QLineF(p1.pos(), p2.pos()).length()
+                    / QLineF(p1.startPos(), p2.startPos()).length();
+            if (event->touchPointStates() & Qt::TouchPointReleased) {
+                // if one of the fingers is released, remember the current scale
+                // factor so that adding another finger later will continue zooming
+                // by adding new scale factor to the existing remembered value.
+                m_totalScaleFactor *= currentScaleFactor;
+                currentScaleFactor = 1.0;
+            }
+            double scale = m_totalScaleFactor * currentScaleFactor;
+            m_render->setZoom(scale);
+        }
     } break;
     default:
         break;
