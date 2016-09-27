@@ -16,11 +16,13 @@ public:
     void setShaderInfo(const ShaderInfoV & shaderInfoV);
     const ShaderInfoV & getShaderInfo() const;
     unsigned int getProgramId();
-    void init();
+    bool init();
+    bool isInit();
 private:
     ShaderInfoV m_shaderInfoV;
     IFunctions * m_ifunctions;
     unsigned int m_programId;
+    bool m_isInit;
 };
 
 
