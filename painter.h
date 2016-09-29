@@ -35,6 +35,7 @@ private:
     CubeTextures m_cubeTextures;
     Shader::Ptr m_shaderPolygon;
     Shader::Ptr m_shaderPoint;
+    Shader::Ptr m_shader;
 };
 
 void drawPoints(const std::vector<PointItem> &pointItemV, Shader::Ptr shaderPoint,

@@ -64,16 +64,32 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
             break;
         }
     }
-    if(pointItemV.size() > 0)
-        drawPoints(pointItemV, m_shaderPoint, m_IFunctions, painterInfo);
-    if(polygonItemV.size() > 0)
-        drawPolygons(polygonItemV, m_shaderPolygon, m_IFunctions, painterInfo);
-    if(imageItemV.size() > 0)
-        drawImages(imageItemV, m_IFunctions, m_imageTextures);
-    if(cubeItemV.size() > 0)
-        drawCubes(cubeItemV, m_IFunctions, m_cubeTextures);
+//    if(pointItemV.size() > 0)
+//        drawPoints(pointItemV, m_shaderPoint, m_IFunctions, painterInfo);
+//    if(polygonItemV.size() > 0)
+//        drawPolygons(polygonItemV, m_shaderPolygon, m_IFunctions, painterInfo);
+//    if(imageItemV.size() > 0)
+//        drawImages(imageItemV, m_IFunctions, m_imageTextures);
+//    if(cubeItemV.size() > 0)
+//        drawCubes(cubeItemV, m_IFunctions, m_cubeTextures);
 //    if(m_model->getType() == Model::OCTOTREE)
 //            drawOctoModel((OctoModel*)m_model, m_IFunctions);
+
+    GLfloat vVertices[] = {0.0f, 0.5f, 0.0f,
+                           -0.5f, -0.5f, 0.0f,
+                           0.5f, -0.5f, 0.0f};
+
+    m_IFunctions->glUseProgram(m_shader->getProgramId());
+    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
+
+    m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
+    m_IFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+    float color[] = {1.0, 1.0, 0.0, 1.0};
+    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
+    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
+    m_IFunctions->glVertexAttrib4fv(idColor, &color[0]);
+    m_IFunctions->glEnableVertexAttribArray(idPosition);
+    m_IFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void painter::setIFunctions(IFunctions *iFunctions)
@@ -86,6 +102,42 @@ void painter::init_shaders()
 {
     //shaderRect(m_IFunctions, m_shaderPolygon);
     //shaderPoint(m_IFunctions, m_shaderPoint);
+    const char * vShaderStr =
+            "#ifdef GL_ES \n"
+            "precision mediump int;\n"
+            "precision mediump float;\n"
+            "#endif \n"
+            "attribute vec4 vPosition; \n"
+            "attribute vec4 vColor;\n"
+            "uniform mat4 matrix; \n"
+            "varying vec4 rColor;\n"
+            "void main() \n"
+            "{ \n"
+            " gl_Position = matrix * vPosition; \n"
+            " rColor = vColor; \n"
+            "} \n";
+
+    const char * fShaderStr =
+            "#ifdef GL_ES \n"
+            "precision mediump int;\n"
+            "precision mediump float;\n"
+            "#endif \n"
+            "varying vec4 rColor;\n"
+            "void main() \n"
+            "{ \n"
+            " gl_FragColor = rColor; \n"
+            "} \n";
+
+    ShaderInfoV shaderInfoV;
+    ShaderInfo::Attributes attributesLocation;
+    attributesLocation.push_back(Attribute("vPosition"));
+    attributesLocation.push_back(Attribute("vColor"));
+    ShaderInfo::Attributes attributesUniformLocation;
+    attributesUniformLocation.push_back(Attribute("matrix"));
+    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(vShaderStr, ShaderInfo::VERTEX,
+                                                         attributesLocation, attributesUniformLocation)));
+    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(fShaderStr, ShaderInfo::FRAGMENT)));
+    m_shader = Shader::Ptr(new Shader(m_IFunctions, shaderInfoV));
 }
 
 void drawPoints(const std::vector<PointItem> &pointItemV, Shader::Ptr shaderPoint,

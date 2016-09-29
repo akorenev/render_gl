@@ -54,7 +54,6 @@ private:
     Item_t::Ptr m_item_t;
     IPainterL m_painterL;
     IPainterInfo::Ptr m_painterInfo;
-    Shader::Ptr m_shader;
 };
 
 }

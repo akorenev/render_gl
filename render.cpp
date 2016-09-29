@@ -1,12 +1,8 @@
 #include "render.h"
 #include <QDebug>
 
-//#include <GL/glu.h>
-//#include <GL/gl.h>
-
 #include "plypainter.h"
 #include "painter.h"
-#include <stdlib.h>
 
 namespace draw
 {
@@ -55,8 +51,8 @@ void render::draw()
     mModelViewMatrix.rotate(m_rotate_z, 0.0, 0.0, 1.0);
 
     mProjection *= mModelViewMatrix;
-//    m_painterInfo->pushMatrix(mProjection);
-//    m_IFunctions.glUseProgram(m_shader->getProgramId());
+    m_painterInfo->pushMatrix(mProjection);
+
 //    const ShaderInfoV & shaderInfoV = m_shader->getShaderInfo();
 //    int matrixId = shaderInfoV[0]->getKeyAttribute("matrix");
 //    if(matrixId != -1)
@@ -72,66 +68,15 @@ void render::draw()
 //    m_IFunctions.glRotated(m_rotate_z, 0.0, 0.0, 1.0);
 
 
-    GLfloat vVertices[] = {0.0f, 0.5f, 0.0f,
-                           -0.5f, -0.5f, 0.0f,
-                           0.5f, -0.5f, 0.0f};
 
-    // Use the program object
-    m_IFunctions.glUseProgram(m_shader->getProgramId());
-    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
-    // Load the vertex data
-    m_IFunctions.glUniformMatrix4fv(idMatrix, 1, 0, mProjection.data());
-    m_IFunctions.glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-    float color[] = {0.0, 1.0, 0.0, 1.0};
-    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
-    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
-    m_IFunctions.glVertexAttrib4fv(idColor, &color[0]);
-    m_IFunctions.glEnableVertexAttribArray(idPosition);
-    m_IFunctions.glDrawArrays(GL_TRIANGLES, 0, 3);
-    //    for(auto & v : m_painterL)
-    //        v->draw(m_painterInfo);
+    for(auto & v : m_painterL)
+        v->draw(m_painterInfo);
 
     m_IFunctions.glUseProgram(0);
     m_IFunctions.glFlush();
     while(!m_painterInfo->emptyMatrix())
         m_painterInfo->popMatrix();
 }
-
-//GLuint render::loadShader(const char * value, GLenum type)
-//{
-
-//    GLuint shader;
-//    GLint compiled;
-
-//    // Create the shader object
-//    shader = m_IFunctions.glCreateShader(type);
-//    if(shader == 0)
-//        return 0;
-//    // Load the shader source
-//    m_IFunctions.glShaderSource(shader, 1, &value, NULL);
-
-//    // Compile the shader
-//    m_IFunctions.glCompileShader(shader);
-//    // Check the compile status
-//    m_IFunctions.glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-
-//    if(!compiled)
-//    {
-//        GLint infoLen = 0;
-//        m_IFunctions.glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-
-//        if(infoLen > 1)
-//        {
-//            char* infoLog = (char*)malloc(sizeof(char) * infoLen);
-//            m_IFunctions.glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-//            qDebug() << " info log " << QString(infoLog);
-//            free(infoLog);
-//        }
-//        m_IFunctions.glDeleteShader(shader);
-//        return 0;
-//    }
-//    return shader;
-//}
 
 void render::init()
 {
@@ -142,105 +87,7 @@ void render::init()
                               m_background.alphaF());
 
     m_IFunctions.glEnable(GL_DEPTH_TEST);
-
-    //    ShaderInfoV shaderInfoV;
-    //    ShaderInfo::Attributes attributes;
-    //    attributes["matrix"] = 0;
-
-    //    const char *  value =
-    //            "varying vec4 vColor;\n"
-    //            "uniform mat4 matrix;\n"
-    //            "void main(){\n"
-    //            "gl_Position = matrix * gl_Vertex;\n"
-    //            "vColor = gl_Color;\n"
-    //            "}\n";
-    //    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::VERTEX, attributes)));
-
-    //    value = "varying vec4 vColor;\n"
-    //            "void main(){\n"
-    //            "gl_FragColor = vColor;\n"
-    //            "}\n";
-    //    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(value, ShaderInfo::FRAGMENT)));
-
-
-    //    m_shader = Shader::Ptr(new Shader(&m_IFunctions, shaderInfoV));
-
     m_painterInfo = IPainterInfo::Ptr(new IPainterInfo());
-    const char * vShaderStr =
-            "#ifdef GL_ES \n"
-            "precision mediump int;\n"
-            "precision mediump float;\n"
-            "#endif \n"
-            "attribute vec4 vPosition; \n"
-            "attribute vec4 vColor;\n"
-            "uniform mat4 matrix; \n"
-            "varying vec4 rColor;\n"
-            "void main() \n"
-            "{ \n"
-            " gl_Position = matrix * vPosition; \n"
-            " rColor = vColor; \n"
-            "} \n";
-
-    const char * fShaderStr =
-            "#ifdef GL_ES \n"
-            "precision mediump int;\n"
-            "precision mediump float;\n"
-            "#endif \n"
-            "varying vec4 rColor;\n"
-            "void main() \n"
-            "{ \n"
-            " gl_FragColor = rColor; \n"
-            "} \n";
-
-    ShaderInfoV shaderInfoV;
-    ShaderInfo::Attributes attributesLocation;
-    attributesLocation.push_back(Attribute("vPosition"));
-    attributesLocation.push_back(Attribute("vColor"));
-    ShaderInfo::Attributes attributesUniformLocation;
-    attributesUniformLocation.push_back(Attribute("matrix"));
-    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(vShaderStr, ShaderInfo::VERTEX,
-                                                         attributesLocation, attributesUniformLocation)));
-    shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(fShaderStr, ShaderInfo::FRAGMENT)));
-    m_shader = Shader::Ptr(new Shader(&m_IFunctions, shaderInfoV));
-    qDebug() << m_shader->isInit();
-
-//    GLuint vertexShader;
-//    GLuint fragmentShader;
-
-//    GLint linked;
-
-//    // Load the vertex/fragment shaders
-//    vertexShader = loadShader(vShaderStr, GL_VERTEX_SHADER);
-//    fragmentShader = loadShader(fShaderStr, GL_FRAGMENT_SHADER);
-//    // Create the program object
-//    programObject = m_IFunctions.glCreateProgram();
-//    if(programObject == 0)
-//        return;
-//    m_IFunctions.glAttachShader(programObject, vertexShader);
-//    m_IFunctions.glAttachShader(programObject, fragmentShader);
-//    // Bind vPosition to attribute 0
-//    m_IFunctions.glBindAttribLocation(programObject, 0, "vPosition");
-//    m_IFunctions.glBindAttribLocation(programObject, 1, "vColor");
-//    // Link the program
-//    m_IFunctions.glLinkProgram(programObject);
-//    idMatrix = m_IFunctions.glGetUniformLocation(programObject, "matrix");
-//    // Check the link status
-//    m_IFunctions.glGetProgramiv(programObject, GL_LINK_STATUS, &linked);
-//    if(!linked)
-//    {
-//        GLint infoLen = 0;
-//        m_IFunctions.glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &infoLen);
-
-//        if(infoLen > 1)
-//        {
-//            char* infoLog = (char *)malloc(sizeof(char) * infoLen);
-//            m_IFunctions.glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
-//            free(infoLog);
-//        }
-//        m_IFunctions.glDeleteProgram(programObject);
-//        return ;
-//    }
-
 }
 
 void render::resize(int w, int h)
