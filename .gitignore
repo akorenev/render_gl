@@ -1,3 +1,4 @@
 *.o
 *.txt.user
 *.pro.user
+*.pro.*

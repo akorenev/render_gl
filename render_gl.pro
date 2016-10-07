@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     painter.cpp \
     qimagedriver.cpp \
     basedriver.cpp \
-    shader.cpp
+    shader.cpp \
+    PointsItem.cpp
 HEADERS  += widget.h \
     render.h \
     model.h \
@@ -63,7 +64,8 @@ HEADERS  += widget.h \
     qimagedriver.h \
     basedriver.h \
     shader.h \
-    shaderinfo.h
+    shaderinfo.h \
+    PointsItem.h
 
 RESOURCES += \
     res.qrc
