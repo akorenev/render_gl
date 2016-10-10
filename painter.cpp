@@ -95,21 +95,6 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
 //    m_IFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
 //    m_IFunctions->glDisableVertexAttribArray(idPosition);
 
-    // points
-//    m_IFunctions->glUseProgram(m_shader->getProgramId());
-//    m_IFunctions->glEnable(GL_PROGRAM_POINT_SIZE);
-//    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
-//    m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
-//    m_IFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-//    float color[] = {1.0, 0.0, 0.0, 1.0};
-//    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
-//    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
-//    m_IFunctions->glVertexAttrib4fv(idColor, &color[0]);
-//    m_IFunctions->glEnableVertexAttribArray(idPosition);
-//    m_IFunctions->glDrawArrays(GL_POINTS, 0, 3);
-//    m_IFunctions->glDisableVertexAttribArray(idPosition);
-//    m_IFunctions->glDisable(GL_PROGRAM_POINT_SIZE);
-
     //vbo
 
     struct Vertex
@@ -143,7 +128,7 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
     const GLubyte indices[] = {0, 1, 2};
 
     m_IFunctions->glUseProgram(m_shader->getProgramId());
-    m_IFunctions->glEnable(GL_PROGRAM_POINT_SIZE);
+
     int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
     m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
 
@@ -161,7 +146,6 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
     m_IFunctions->glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLubyte), GL_UNSIGNED_BYTE, indices);
 
     m_IFunctions->glDisableVertexAttribArray(idPosition);
-    m_IFunctions->glDisable(GL_PROGRAM_POINT_SIZE);
 
 }
 
@@ -187,7 +171,7 @@ void painter::init_shaders()
             "void main() \n"
             "{ \n"
             " gl_Position = matrix * vPosition; \n"
-            " gl_PointSize = 4.0; \n"
+            " gl_PointSize = 10.0; \n"
             " rColor = vColor; \n"
             "} \n";
 
