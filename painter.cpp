@@ -78,18 +78,91 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
     GLfloat vVertices[] = {0.0f, 0.5f, 0.0f,
                            -0.5f, -0.5f, 0.0f,
                            0.5f, -0.5f, 0.0f};
+    GLfloat vColor[] = {1.0, 0.0, 0.0, 1.0,
+                        1.0, 0.0, 0.0, 1.0,
+                        1.0, 0.0, 0.0, 1.0};
+
+    // triangles
+//    m_IFunctions->glUseProgram(m_shader->getProgramId());
+//    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
+//    m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
+//    m_IFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+//    float color[] = {1.0, 0.0, 0.0, 1.0};
+//    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
+//    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
+//    m_IFunctions->glVertexAttrib4fv(idColor, &color[0]);
+//    m_IFunctions->glEnableVertexAttribArray(idPosition);
+//    m_IFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
+//    m_IFunctions->glDisableVertexAttribArray(idPosition);
+
+    // points
+//    m_IFunctions->glUseProgram(m_shader->getProgramId());
+//    m_IFunctions->glEnable(GL_PROGRAM_POINT_SIZE);
+//    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
+//    m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
+//    m_IFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+//    float color[] = {1.0, 0.0, 0.0, 1.0};
+//    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
+//    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
+//    m_IFunctions->glVertexAttrib4fv(idColor, &color[0]);
+//    m_IFunctions->glEnableVertexAttribArray(idPosition);
+//    m_IFunctions->glDrawArrays(GL_POINTS, 0, 3);
+//    m_IFunctions->glDisableVertexAttribArray(idPosition);
+//    m_IFunctions->glDisable(GL_PROGRAM_POINT_SIZE);
+
+    //vbo
+
+    struct Vertex
+    {
+        Vertex(float x, float y, float z,
+               float r, float g, float b, float a)
+        {
+            position[0] = x;
+            position[1] = y;
+            position[2] = z;
+
+            color[0] = r;
+            color[1] = g;
+            color[2] = b;
+            color[3] = a;
+
+        }
+        float position[3];
+        float color[4];
+    };
+
+
+    const Vertex vertices[] = { Vertex(0.0f, 0.5f, 0.0f,
+                                       1.0, 0.0, 0.0, 1.0),
+                                Vertex(-0.5f, -0.5f, 0.0f,
+                                       1.0, 0.0, 0.0, 1.0),
+                                Vertex(0.5f, -0.5f, 0.0f,
+                                       0.0, 1.0, 0.0, 1.0),
+                              };
+
+    const GLubyte indices[] = {0, 1, 2};
 
     m_IFunctions->glUseProgram(m_shader->getProgramId());
+    m_IFunctions->glEnable(GL_PROGRAM_POINT_SIZE);
     int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
-
     m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
-    m_IFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-    float color[] = {1.0, 1.0, 0.0, 1.0};
-    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
+
     int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
-    m_IFunctions->glVertexAttrib4fv(idColor, &color[0]);
+
+    m_IFunctions->glVertexAttribPointer(idPosition, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), &vertices[0].position);
     m_IFunctions->glEnableVertexAttribArray(idPosition);
-    m_IFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
+    m_IFunctions->glVertexAttribPointer(idColor, 4, GL_FLOAT, GL_TRUE,
+                          sizeof(Vertex), &vertices[0].color);
+    m_IFunctions->glEnableVertexAttribArray(idColor);
+
+    m_IFunctions->glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLubyte), GL_UNSIGNED_BYTE, indices);
+
+    m_IFunctions->glDisableVertexAttribArray(idPosition);
+    m_IFunctions->glDisable(GL_PROGRAM_POINT_SIZE);
+
 }
 
 void painter::setIFunctions(IFunctions *iFunctions)
@@ -114,6 +187,7 @@ void painter::init_shaders()
             "void main() \n"
             "{ \n"
             " gl_Position = matrix * vPosition; \n"
+            " gl_PointSize = 4.0; \n"
             " rColor = vColor; \n"
             "} \n";
 
