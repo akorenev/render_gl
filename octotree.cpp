@@ -1,5 +1,4 @@
 #include "octotree.h"
-#include "pointitem.h"
 
 int OctoTree::size = 9;
 
@@ -169,8 +168,8 @@ void OctoModel::fillVector(Ray::Type type, PointDV & v, Item * item)
     }break;
     case Ray::POINT:
     {
-        if(item->getType() == Item::POINT)
-            v.push_back(((PointItem*)item)->getPoint());
+//        if(item->getType() == Item::POINT)
+//            v.push_back(((PointItem*)item)->getPoint());
     } break;
     default:
         break;

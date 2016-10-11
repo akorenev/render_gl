@@ -2,7 +2,6 @@
 #define PlyModel_H
 
 #include "octotree.h"
-#include "pointitem.h"
 
 class PlyModel : public OctoModel
 {

@@ -4,7 +4,6 @@
 #include <string>
 #include <list>
 #include <stdlib.h>
-#include "pointitem.h"
 #include <QDebug>
 #include "plymodel.h"
 

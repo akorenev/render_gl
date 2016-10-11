@@ -2,7 +2,7 @@
 #define PAINTER_H
 
 #include "ipainter.h"
-#include "pointitem.h"
+#include "pointsitem.h"
 #include "imageitem.h"
 #include "cubeitem.h"
 #include "polygonitem.h"
@@ -38,8 +38,6 @@ private:
     Shader::Ptr m_shader;
 };
 
-void drawPoints(const std::vector<PointItem> &pointItemV, Shader::Ptr shaderPoint,
-                IFunctions * iFunctions, IPainterInfo::Ptr painterInfo);
 void drawOctoModel(OctoModel * model, IFunctions * iFunctions);
 void drawImages(const std::vector<ImageItem *> &imageItemV,
                 IFunctions * iFunctions,

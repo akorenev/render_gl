@@ -309,8 +309,8 @@ void render::releaseMouse()
     if(!m_item_t)
         return;
     unsigned char color[4] = {255, 255, 255, 255};
-    PointItem * pointItem = (PointItem*)m_item_t->item;
-    pointItem->setFill(color);
+//    PointItem * pointItem = (PointItem*)m_item_t->item;
+//    pointItem->setFill(color);
     m_item_t = 0;
 
 }

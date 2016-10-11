@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     model.cpp \
     filter.cpp \
     item.cpp \
-    pointitem.cpp \
     polygonitem.cpp \
     imageitem.cpp \
     cubeitem.cpp \
@@ -35,14 +34,13 @@ SOURCES += main.cpp\
     qimagedriver.cpp \
     basedriver.cpp \
     shader.cpp \
-    PointsItem.cpp
+    pointsitem.cpp
 HEADERS  += widget.h \
     render.h \
     model.h \
     ifunctions.h \
     filter.h \
     item.h \
-    pointitem.h \
     polygonitem.h \
     imageitem.h \
     cubeitem.h \
@@ -65,7 +63,7 @@ HEADERS  += widget.h \
     basedriver.h \
     shader.h \
     shaderinfo.h \
-    PointsItem.h
+    pointsitem.h
 
 RESOURCES += \
     res.qrc

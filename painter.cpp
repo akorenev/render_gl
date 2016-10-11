@@ -32,101 +32,6 @@ painter::~painter()
 
 void painter::draw(IPainterInfo::Ptr painterInfo)
 {
-    std::vector<PointItem> pointItemV;
-    std::vector<PolygonItem*> polygonItemV;
-    std::vector<ImageItem*> imageItemV;
-    std::vector<CubeItem*> cubeItemV;
-    for(auto & e : m_model->getItemL())
-    {
-        switch (e->getType())
-        {
-        case Item::POINT:
-        {
-            PointItem * item = (PointItem*)e;
-            pointItemV.push_back(*item);
-        } break;
-        case Item::POLYGON:
-        {
-            PolygonItem * item = (PolygonItem*)e;
-            polygonItemV.push_back(item);
-        } break;
-        case Item::IMAGE:
-        {
-            ImageItem * item = (ImageItem*)e;
-            imageItemV.push_back(item);
-        } break;
-        case Item::CUBE:
-        {
-            CubeItem * item = (CubeItem*)e;
-            cubeItemV.push_back(item);
-        } break;
-        default:
-            break;
-        }
-    }
-//    if(pointItemV.size() > 0)
-//        drawPoints(pointItemV, m_shaderPoint, m_IFunctions, painterInfo);
-//    if(polygonItemV.size() > 0)
-//        drawPolygons(polygonItemV, m_shaderPolygon, m_IFunctions, painterInfo);
-//    if(imageItemV.size() > 0)
-//        drawImages(imageItemV, m_IFunctions, m_imageTextures);
-//    if(cubeItemV.size() > 0)
-//        drawCubes(cubeItemV, m_IFunctions, m_cubeTextures);
-//    if(m_model->getType() == Model::OCTOTREE)
-//            drawOctoModel((OctoModel*)m_model, m_IFunctions);
-
-    GLfloat vVertices[] = {0.0f, 0.5f, 0.0f,
-                           -0.5f, -0.5f, 0.0f,
-                           0.5f, -0.5f, 0.0f};
-    GLfloat vColor[] = {1.0, 0.0, 0.0, 1.0,
-                        1.0, 0.0, 0.0, 1.0,
-                        1.0, 0.0, 0.0, 1.0};
-
-    // triangles
-//    m_IFunctions->glUseProgram(m_shader->getProgramId());
-//    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
-//    m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
-//    m_IFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-//    float color[] = {1.0, 0.0, 0.0, 1.0};
-//    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
-//    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
-//    m_IFunctions->glVertexAttrib4fv(idColor, &color[0]);
-//    m_IFunctions->glEnableVertexAttribArray(idPosition);
-//    m_IFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
-//    m_IFunctions->glDisableVertexAttribArray(idPosition);
-
-    //vbo
-
-    struct Vertex
-    {
-        Vertex(float x, float y, float z,
-               float r, float g, float b, float a)
-        {
-            position[0] = x;
-            position[1] = y;
-            position[2] = z;
-
-            color[0] = r;
-            color[1] = g;
-            color[2] = b;
-            color[3] = a;
-
-        }
-        float position[3];
-        float color[4];
-    };
-
-
-    const Vertex vertices[] = { Vertex(0.0f, 0.5f, 0.0f,
-                                       1.0, 0.0, 0.0, 1.0),
-                                Vertex(-0.5f, -0.5f, 0.0f,
-                                       1.0, 0.0, 0.0, 1.0),
-                                Vertex(0.5f, -0.5f, 0.0f,
-                                       0.0, 1.0, 0.0, 1.0),
-                              };
-
-    const GLubyte indices[] = {0, 1, 2};
-
     m_IFunctions->glUseProgram(m_shader->getProgramId());
 
     int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
@@ -134,18 +39,36 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
 
     int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
 
-    m_IFunctions->glVertexAttribPointer(idPosition, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), &vertices[0].position);
-    m_IFunctions->glEnableVertexAttribArray(idPosition);
+    for(auto & e : m_model->getItemL())
+    {
+        switch (e->getType())
+        {
+        case Item::POINTS:
+        {
+            pointsitem * item = dynamic_cast<pointsitem*>(e);
+            Q_ASSERT(item);
 
-    int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
-    m_IFunctions->glVertexAttribPointer(idColor, 4, GL_FLOAT, GL_TRUE,
-                          sizeof(Vertex), &vertices[0].color);
-    m_IFunctions->glEnableVertexAttribArray(idColor);
+            m_IFunctions->glVertexAttribPointer(idPosition, 3, GL_FLOAT, GL_FALSE,
+                                                sizeof(Vertex), &item->m_vertexes[0].position);
+            m_IFunctions->glEnableVertexAttribArray(idPosition);
 
-    m_IFunctions->glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLubyte), GL_UNSIGNED_BYTE, indices);
+            int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
+            m_IFunctions->glVertexAttribPointer(idColor, 4, GL_FLOAT, GL_TRUE,
+                                                sizeof(Vertex), &item->m_vertexes[0].color);
+            m_IFunctions->glEnableVertexAttribArray(idColor);
 
+            m_IFunctions->glDrawElements(GL_TRIANGLES, item->m_indices.size(), GL_UNSIGNED_SHORT, &item->m_indices[0]);
+
+        } break;
+        default:
+            break;
+        }
+    }
     m_IFunctions->glDisableVertexAttribArray(idPosition);
+
+//    if(m_model->getType() == Model::OCTOTREE)
+//            drawOctoModel((OctoModel*)m_model, m_IFunctions);
+
 
 }
 
@@ -196,47 +119,6 @@ void painter::init_shaders()
                                                          attributesLocation, attributesUniformLocation)));
     shaderInfoV.push_back(ShaderInfo::Ptr(new ShaderInfo(fShaderStr, ShaderInfo::FRAGMENT)));
     m_shader = Shader::Ptr(new Shader(m_IFunctions, shaderInfoV));
-}
-
-void drawPoints(const std::vector<PointItem> &pointItemV, Shader::Ptr shaderPoint,
-                IFunctions * iFunctions, IPainterInfo::Ptr painterInfo)
-{
-//    if(pointItemV.empty())
-//        return;
-//    const PointItem & pointItem = pointItemV[0];
-//    const PointD & p = pointItem.getPoint();
-
-//    iFunctions->glEnableClientState(GL_COLOR_ARRAY);
-//    iFunctions->glEnableClientState(GL_VERTEX_ARRAY);
-//    iFunctions->glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(PointItem) , pointItem.getFill());
-//    iFunctions->glVertexPointer(3, GL_DOUBLE, sizeof(PointItem), &(p.x()));
-//    iFunctions->glPointSize(4.0);
-//    iFunctions->glDrawArrays(GL_POINTS, 0, pointItemV.size());
-//    iFunctions->glDisableClientState(GL_COLOR_ARRAY);
-//    iFunctions->glDisableClientState(GL_VERTEX_ARRAY);
-
-//    iFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-//    iFunctions->glEnableVertexAttribArray(0);
-//    iFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
-
-//    iFunctions->glUseProgram(shaderPoint->getProgramId());
-//    const ShaderInfoV & shaderInfoV = shaderPoint->getShaderInfo();
-//    int matrixId = shaderInfoV[1]->getKeyAttribute("matrix");
-//    if(matrixId != -1)
-//        iFunctions->glUniformMatrix4fv(matrixId, 1, 0, painterInfo->topMatrix().data());
-//    int colorId = shaderInfoV[0]->getKeyAttribute("color");
-//    if(colorId != -1)
-//    {
-//        float v[] = {0.0, 1.0, 0.0, 1.0};
-//        iFunctions->glUniform4fv(colorId, 1, &v[0]);
-//    }
-//    GLfloat vVertices[] = {0.0f, 500.0f, 0.0f,
-//                           -500.0f, -500.0f, 0.0f,
-//                           500.0f, -500.0f, 0.0f};
-
-//    iFunctions->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-//    iFunctions->glEnableVertexAttribArray(0);
-//    iFunctions->glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void drawOctoModel_p(const OctoTree * node, IFunctions * iFunctions)

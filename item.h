@@ -21,7 +21,8 @@ public:
         POINT,
         POLYGON,
         IMAGE,
-        CUBE
+        CUBE,
+        POINTS
     };
 public:
     Item();
