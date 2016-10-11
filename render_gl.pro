@@ -63,7 +63,8 @@ HEADERS  += widget.h \
     basedriver.h \
     shader.h \
     shaderinfo.h \
-    pointsitem.h
+    pointsitem.h \
+    vertex.h
 
 RESOURCES += \
     res.qrc

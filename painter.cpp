@@ -32,24 +32,24 @@ painter::~painter()
 
 void painter::draw(IPainterInfo::Ptr painterInfo)
 {
-    m_IFunctions->glUseProgram(m_shader->getProgramId());
-
-    int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
-    m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
-
-    int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
-
     for(auto & e : m_model->getItemL())
     {
         switch (e->getType())
         {
         case Item::POINTS:
         {
+            m_IFunctions->glUseProgram(m_shader->getProgramId());
+
+            int idMatrix = m_shader->getShaderInfo()[0]->getKeyAttribute("matrix", ShaderInfo::UNIFORM);
+            m_IFunctions->glUniformMatrix4fv(idMatrix, 1, 0, painterInfo->topMatrix().data());
+
+            int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
+
             pointsitem * item = dynamic_cast<pointsitem*>(e);
             Q_ASSERT(item);
 
             m_IFunctions->glVertexAttribPointer(idPosition, 3, GL_FLOAT, GL_FALSE,
-                                                sizeof(Vertex), &item->m_vertexes[0].position);
+                                                sizeof(Vertex), &item->m_vertexes[0].point);
             m_IFunctions->glEnableVertexAttribArray(idPosition);
 
             int idColor = m_shader->getShaderInfo()[0]->getKeyAttribute("vColor", ShaderInfo::LOCATION);
@@ -59,16 +59,15 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
 
             m_IFunctions->glDrawElements(GL_TRIANGLES, item->m_indices.size(), GL_UNSIGNED_SHORT, &item->m_indices[0]);
 
+            m_IFunctions->glDisableVertexAttribArray(idPosition);
+
         } break;
         default:
             break;
         }
     }
-    m_IFunctions->glDisableVertexAttribArray(idPosition);
-
 //    if(m_model->getType() == Model::OCTOTREE)
 //            drawOctoModel((OctoModel*)m_model, m_IFunctions);
-
 
 }
 
