@@ -2,14 +2,10 @@
 
 PlyModel::PlyModel(const BoundingBox &bbox)
     : OctoModel(4096, bbox)
-    , m_vertexes(0)
-    , m_vertexesSize(0)
-    , m_faceVertexSize(0){}
+    , m_model(0){}
 
 PlyModel::~PlyModel()
 {
-    clearVertexes();
-    clearFaceVertexes();
 }
 
 int PlyModel::getType()
@@ -23,54 +19,12 @@ Item_t::Ptr PlyModel::searchFirstItem(const Ray &ray)
     return item;
 }
 
-int PlyModel::getVertexesSize()
+pointsitem * PlyModel::getModel()
 {
-    return m_vertexesSize;
+    return m_model;
 }
 
-double * PlyModel::getVertexes()
+void PlyModel::setModel(pointsitem * model)
 {
-    return m_vertexes;
-}
-
-void PlyModel::setVertexes(double *vertexes, unsigned int vertexesSize)
-{
-    clearVertexes();
-    m_vertexes = vertexes;
-    m_vertexesSize = vertexesSize;
-}
-
-void PlyModel::clearVertexes()
-{
-    if(m_vertexesSize)
-    {
-        delete [] m_vertexes;
-        m_vertexesSize = 0;
-    }
-}
-
-void PlyModel::clearFaceVertexes()
-{
-    if(m_faceVertexSize)
-    {
-        delete [] m_faceVertex;
-        m_faceVertexSize = 0;
-    }
-}
-
-int PlyModel::getFaceVertexesSize()
-{
-    return m_faceVertexSize;
-}
-
-void PlyModel::setFaceVertexes(unsigned int *faceVertex, unsigned int faceVertexSize)
-{
-    clearFaceVertexes();
-    m_faceVertex = faceVertex;
-    m_faceVertexSize = faceVertexSize;
-}
-
-unsigned int * PlyModel::getFaceVertexes()
-{
-    return m_faceVertex;
+    m_model = model;
 }

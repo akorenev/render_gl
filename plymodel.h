@@ -2,6 +2,7 @@
 #define PlyModel_H
 
 #include "octotree.h"
+#include "pointsitem.h"
 
 class PlyModel : public OctoModel
 {
@@ -10,20 +11,10 @@ public:
     ~PlyModel();
     int getType();
     Item_t::Ptr searchFirstItem(const Ray & ray);
-    int getVertexesSize();
-    double * getVertexes();
-    void setVertexes(double * vertexes, unsigned int vertexesSize);
-
-    int getFaceVertexesSize();
-    void setFaceVertexes(unsigned int * faceVertex, unsigned int faceVertexSize);
-    unsigned int * getFaceVertexes();
+    pointsitem * getModel();
+    void setModel(pointsitem * model);
 private:
-    void clearVertexes();
-    void clearFaceVertexes();
-    double * m_vertexes;
-    unsigned int m_vertexesSize;
-    unsigned int * m_faceVertex;
-    unsigned int m_faceVertexSize;
+    pointsitem * m_model;
 };
 
 #endif // PlyModel_H

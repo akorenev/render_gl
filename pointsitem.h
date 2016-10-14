@@ -11,7 +11,6 @@ public:
     pointsitem();
     ~pointsitem();
 
-    void addVertex(const Vertex & vertex);
     Type getType() const;
 
     std::vector<Vertex> m_vertexes;

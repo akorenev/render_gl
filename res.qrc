@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="test1">res/test1.png</file>
+        <file alias="test">res/test1.png</file>
+        <file alias="bunny">res/bunny.ply</file>
     </qresource>
 </RCC>

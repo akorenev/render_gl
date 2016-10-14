@@ -10,6 +10,8 @@
 #include "plymodel.h"
 #include "qimagedriver.h"
 #include <QApplication>
+#include <QResource>
+#include <QFile>
 #include "pointsitem.h"
 
 Widget::Widget(QWidget *parent)
@@ -131,22 +133,18 @@ void Widget::initializeGL()
 //    itemUS.insert(item_2);
 
     BoundingBox input(PointD(-1000, -1000, -1000), PointD(1000, 1000, 1000));
-//    plydriver driver;
-//    PlyModel * plyModel = new PlyModel(input);
-//    driver.load(plyModel,
-//                QString("%1%2%3")
-//                .arg(qApp->applicationDirPath())
-//                .arg("/")
-//                .arg("dragon.ply").toStdString().c_str());
-//    m_render->addModel(plyModel);
-    for(auto & v : itemUS)
-        BoundingBox::calculate(input, v->getBoundingBox());
+    plydriver driver;
+    PlyModel * plyModel = new PlyModel(input);
+    driver.load(plyModel, QString(":/bunny").toStdString().c_str());
+    m_render->addModel(plyModel);
+//    for(auto & v : itemUS)
+//        BoundingBox::calculate(input, v->getBoundingBox());
 //    qDebug() << input.min.x() << input.min.y() << input.min.z()
 //             << input.max.x() << input.max.y() << input.max.z();
-    OctoModel * model = new OctoModel(4096, input);
-    itemUS.insert(new pointsitem());
-    model->setItemL(itemUS);
-    m_render->addModel(model);
+//    OctoModel * model = new OctoModel(4096, input);
+//    itemUS.insert(new pointsitem());
+//    model->setItemL(itemUS);
+//    m_render->addModel(model);
 
 
     installEventFilter(new Filter(m_render));
