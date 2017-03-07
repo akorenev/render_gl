@@ -3,11 +3,13 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include "model.h"
 
 namespace draw
 {
     class render;
 }
+
 
 class Widget : public QOpenGLWidget,
         protected QOpenGLFunctions
@@ -17,6 +19,8 @@ class Widget : public QOpenGLWidget,
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
+    void addModel(Model * model);
+    void removeModel(Model * model);
 protected:
     void initializeGL();
     void paintGL();

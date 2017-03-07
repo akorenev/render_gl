@@ -246,6 +246,7 @@ void render::addModel(Model * model)
         _ipainter->setIFunctions(&m_IFunctions);
         m_painterL.push_back(_ipainter);
     }
+    emit update();
 }
 
 void render::removeModel(Model *model)
@@ -259,6 +260,7 @@ void render::removeModel(Model *model)
         delete *it;
         m_painterL.erase(it);
     }
+    emit update();
 }
 
 void render::setBackground(const QColor &color)
