@@ -1,10 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-07-28T18:22:00
-#
-#-------------------------------------------------
-
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets opengl
 
@@ -12,8 +6,6 @@ TARGET = render_gl
 TEMPLATE = app
 
 CONFIG += c++11
-
-#LIBS += -lGLU
 
 SOURCES += main.cpp\
         widget.cpp \

@@ -192,94 +192,6 @@ void render::updatePosition(int x, int y, int _x, int _y)
     m_currentPos[1] += m_zoom *(vv1[1] - vv2[1]);
     m_currentPos[2] += m_zoom *(vv1[2] - vv2[2]);
     emit update();
-//    QMatrix4x4 m;
-//    m.setToIdentity();
-//    m.translate(m_currentPos.x(), m_currentPos.y(), m_boundingBox.min.z());
-//    m.scale(m_zoom, m_zoom, m_zoom);
-//    m.rotate(m_rotate_x, 1.0, 0.0, 0.0);
-//    m.rotate(m_rotate_y, 0.0, 1.0, 0.0);
-//    m.rotate(m_rotate_z, 0.0, 0.0, 1.0);
-
-//    QGenericMatrix<4, 4, double> m_;
-//    for(int i = 0; i < 16 ; ++i)
-//        m_.data()[i] = m.data()[i];
-
-//    QMatrix4x4 m1;
-//    m1.setToIdentity();
-//    m1.perspective(45, m_ratio, 1, 10000);
-
-//    QGenericMatrix<4, 4, double> m1_;
-//    for(int i = 0; i < 16 ; ++i)
-//        m1_.data()[i] = m1.data()[i];
-
-//    if(m_painterL.empty())
-//        return;
-
-//    const GLint viewport[4] = {0, 0, m_width, m_height};
-
-//    if(!m_item_t)
-//    {
-//        double x4, y4, z4;
-//        gluUnProject(_x, m_height - _y, -1, m_.data(), m1_.data(), viewport, &x4, &y4, &z4);
-//        QVector3D origin(x4, y4, z4);
-//        double x3, y3, z3;
-//        gluUnProject(_x, m_height - _y, 1, m_.data(), m1_.data(), viewport, &x3, &y3, &z3);
-//        x3 -=x4;
-//        y3 -=y4;
-//        z3 -=z4;
-//        QVector3D direction(x3, y3, z3);
-//        direction.normalize();
-
-//        Item_tL item_tL;
-//        RayPoint ray(origin, direction);
-//        for(auto & v : m_painterL)
-//        {
-//            Model * model = v->getModel();
-//            if(Item_t::Ptr item_t = model->searchFirstItem(ray))
-//                item_tL.push_back(item_t);
-
-//        }
-//        if(item_tL.empty())
-//            return;
-//        item_tL.sort(SortItem_t);
-//        m_item_t = *item_tL.begin();
-
-//        PointItem * pointItem = (PointItem*)m_item_t->item;
-//        unsigned char color[4] = {0, 255, 0, 255};
-//        pointItem->setFill(color);
-//        qDebug() << item_tL.size();
-//    }
-
-
-//    //Item * item = item_t->item;
-//    //qDebug() << item->getType();
-
-//    //double xx = item->getBoundingBox().min.x() / 2 + item->getBoundingBox().max.x() / 2;
-//    //double yy = item->getBoundingBox().min.y() / 2 + item->getBoundingBox().max.y() / 2;
-//    //double zz = item->getBoundingBox().min.z() / 2 + item->getBoundingBox().max.z() / 2;
-//    const QVector3D & v = m_item_t->v;
-
-//    double x1;
-//    double y1;
-//    double z1;
-//    gluProject(v[0], v[1], v[2], m_.data(), m1_.data(), viewport, &x1, &y1, &z1);
-
-//    double zz = z1;
-
-//    gluUnProject(x, m_height-y, zz, m_.data(), m1_.data(), viewport, &x1, &y1, &z1);
-
-//    double x2;
-//    double y2;
-//    double z2;
-//    gluUnProject(_x, m_height-_y, zz, m_.data(), m1_.data(), viewport, &x2, &y2, &z2);
-
-//    m_currentPos[0] += m_zoom *(x1 - x2);
-//    m_currentPos[1] += m_zoom *(y1 - y2);
-//    m_currentPos[2] += m_zoom *(z1 - z2);
-
-//    //qDebug() << x1 - x2 << "  " <<  z1 - z2;
-//    emit update();
-  
 }
 
 const PointD &render::getPos() const
@@ -341,28 +253,24 @@ void render::removeModel(Model *model)
 void render::setBackground(const QColor &color)
 {
     m_background = color;
-    draw();
     emit update();
 }
 
 void render::setRotateX(const double &x)
 {
     m_rotate_x = x;
-    draw();
     emit update();
 }
 
 void render::setRotateY(const double &y)
 {
     m_rotate_y = y;
-    draw();
     emit update();
 }
 
 void render::setRotateZ(const double &z)
 {
     m_rotate_z = z;
-    draw();
     emit update();
 }
 

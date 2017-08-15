@@ -1,5 +1,5 @@
 #include "shader.h"
-#include <QDebug>
+#include <iostream>
 
 GLuint loadShader(const char * value, GLenum type, IFunctions * ifunctions);
 
@@ -97,7 +97,7 @@ bool Shader::init()
             int id = m_ifunctions->glGetUniformLocation(m_programId, (*it).getValue()); // check exist attribute
             if(id == -1)
             {
-                qDebug() << "could not bind uniform location attribute " << (*it).getValue();
+                std::cout << "could not bind uniform location attribute " << (*it).getValue() << std::endl;
                 m_isInit = false;
                 return m_isInit;
             }
@@ -157,7 +157,7 @@ GLuint loadShader(const char * value, GLenum type, IFunctions * ifunctions)
         {
             char* infoLog = (char*)malloc(sizeof(char) * infoLen);
             ifunctions->glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-            qDebug() << " shader error compile " << QString(infoLog);
+            std::cout << " shader error compile " << QString(infoLog).toStdString() << std::endl;
             free(infoLog);
         }
         ifunctions->glDeleteShader(shader);
