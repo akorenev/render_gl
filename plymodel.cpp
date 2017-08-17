@@ -19,12 +19,12 @@ Item_t::Ptr PlyModel::searchFirstItem(const Ray &ray)
     return item;
 }
 
-pointsitem * PlyModel::getModel()
+TriangleItem * PlyModel::getModel()
 {
     return m_model;
 }
 
-void PlyModel::setModel(pointsitem * model)
+void PlyModel::setModel(TriangleItem * model)
 {
     m_model = model;
 }

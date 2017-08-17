@@ -5,14 +5,10 @@
 #include "item.h"
 #include "vertex.h"
 
-class pointsitem : public Item
+class TriangleItem : public Item
 {
 public:
-    pointsitem();
-    ~pointsitem();
-
     Type getType() const;
-
     std::vector<Vertex> m_vertexes;
     std::vector<unsigned short> m_indices;
 };

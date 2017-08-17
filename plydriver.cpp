@@ -37,7 +37,7 @@ bool plydriver::load(Model * model, const char * filepath)
     string header_line;
     bool read_header = false;
     Header header;
-    pointsitem * item = new pointsitem;
+    TriangleItem * item = new TriangleItem;
     int countVertex = 0;
     int countfaceVertex = 0;
     int count = 0;

@@ -18,11 +18,12 @@ class Item
 public:
     enum Type
     {
-        POINT,
         POLYGON,
         IMAGE,
         CUBE,
-        POINTS
+        POINT,
+        TRIANGLE,
+        SPHERE
     };
 public:
     Item();

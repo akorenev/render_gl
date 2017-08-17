@@ -2,7 +2,7 @@
 #define PlyModel_H
 
 #include "octotree.h"
-#include "pointsitem.h"
+#include "triangleitem.h"
 
 class PlyModel : public OctoModel
 {
@@ -11,10 +11,10 @@ public:
     ~PlyModel();
     int getType();
     Item_t::Ptr searchFirstItem(const Ray & ray);
-    pointsitem * getModel();
-    void setModel(pointsitem * model);
+    TriangleItem * getModel();
+    void setModel(TriangleItem * model);
 private:
-    pointsitem * m_model;
+    TriangleItem * m_model;
 };
 
 #endif // PlyModel_H

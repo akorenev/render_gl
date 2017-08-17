@@ -26,7 +26,7 @@ SOURCES += main.cpp\
     qimagedriver.cpp \
     basedriver.cpp \
     shader.cpp \
-    pointsitem.cpp
+    triangleitem.cpp
 HEADERS  += widget.h \
     render.h \
     model.h \
@@ -39,9 +39,6 @@ HEADERS  += widget.h \
     octotree.h \
     color.h \
     point.h \
-    e_data/swap.h \
-    e_data/bubble_sort.h \
-    e_data/heap_sort.h \
     ray.h \
     boundingbox.h \
     item_t.h \
@@ -55,7 +52,7 @@ HEADERS  += widget.h \
     basedriver.h \
     shader.h \
     shaderinfo.h \
-    pointsitem.h \
+    triangleitem.h \
     vertex.h
 
 RESOURCES += \

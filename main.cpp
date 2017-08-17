@@ -9,7 +9,7 @@
 #include "qimagedriver.h"
 #include <QApplication>
 #include <QFile>
-#include "pointsitem.h"
+#include "triangleitem.h"
 
 
 void init_0(Model *& model)
@@ -119,7 +119,7 @@ void init_0(Model *& model)
 void init_1(Model *& model)
 {
     ItemUS itemUS;
-    pointsitem * items = new pointsitem();
+    TriangleItem * items = new TriangleItem();
     for(int i = 0; i < 3; ++i)
     {
 

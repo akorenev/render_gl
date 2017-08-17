@@ -2,7 +2,7 @@
 #define PAINTER_H
 
 #include "ipainter.h"
-#include "pointsitem.h"
+#include "triangleitem.h"
 #include "imageitem.h"
 #include "cubeitem.h"
 #include "polygonitem.h"

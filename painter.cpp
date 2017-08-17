@@ -36,7 +36,7 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
     {
         switch (e->getType())
         {
-        case Item::POINTS:
+        case Item::TRIANGLE:
         {
             m_IFunctions->glUseProgram(m_shader->getProgramId());
 
@@ -45,7 +45,7 @@ void painter::draw(IPainterInfo::Ptr painterInfo)
 
             int idPosition = m_shader->getShaderInfo()[0]->getKeyAttribute("vPosition", ShaderInfo::LOCATION);
 
-            pointsitem * item = dynamic_cast<pointsitem*>(e);
+            TriangleItem * item = dynamic_cast<TriangleItem*>(e);
             Q_ASSERT(item);
 
             m_IFunctions->glVertexAttribPointer(idPosition, 3, GL_FLOAT, GL_FALSE,

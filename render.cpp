@@ -162,10 +162,10 @@ void render::updatePosition(int x, int y, int _x, int _y)
         item_tL.sort(SortItem_t);
         m_item_t = *item_tL.begin();
 
-        pointsitem * pointItem = (pointsitem*)m_item_t->item;
-        unsigned char color[4] = {0, 255, 0, 255};
+//        pointsitem * pointItem = (pointsitem*)m_item_t->item;
+//        unsigned char color[4] = {0, 255, 0, 255};
         //pointItem->setFill(color);
-        std::cout << "selected item " << item_tL.size() << std::endl;
+//        std::cout << "selected item " << item_tL.size() << std::endl;
     }
 
     const QVector3D & v = m_item_t->v;
@@ -293,8 +293,8 @@ void render::releaseMouse()
 {
     if(!m_item_t)
         return;
-    unsigned char color[4] = {255, 255, 255, 255};
-    pointsitem * pointItem = (pointsitem*)m_item_t->item;
+//    unsigned char color[4] = {255, 255, 255, 255};
+//    pointsitem * pointItem = (pointsitem*)m_item_t->item;
     //if(pointItem)
        //pointItem->setFill(color);
     m_item_t = 0;
