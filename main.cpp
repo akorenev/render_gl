@@ -120,7 +120,7 @@ void init_1(Model *& model)
 {
     ItemUS itemUS;
     pointsitem * items = new pointsitem();
-    for(int i = 0; i < 5; ++i)
+    for(int i = 0; i < 3; ++i)
     {
 
         PointF p;

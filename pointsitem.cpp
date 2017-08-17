@@ -2,11 +2,11 @@
 
 pointsitem::pointsitem()
 {
-//    addVertex(Vertex(PointF(0.0f, 0.5f, 0.0f),
+//    m_vertexes.push_back(Vertex(PointF(0.0f, 0.5f, 0.0f),
 //                     ColorF(1.0, 0.0, 0.0, 1.0)));
-//    addVertex(Vertex(PointF(-0.5f, -0.5f, 0.0f),
+//    m_vertexes.push_back(Vertex(PointF(-0.5f, -0.5f, 0.0f),
 //                     ColorF(1.0, 0.0, 0.0, 1.0)));
-//    addVertex(Vertex(PointF(0.5f, -0.5f, 0.0f),
+//    m_vertexes.push_back(Vertex(PointF(0.5f, -0.5f, 0.0f),
 //                     ColorF(0.0, 1.0, 0.0, 1.0)));
 }
 
